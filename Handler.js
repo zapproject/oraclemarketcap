@@ -8,9 +8,9 @@ var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
 var mysql = require('mysql');
 var con = mysql.createConnection({
 	host: "localhost",
-	user: "user",
-	password: "pass",
-	database: "mydb"
+	user: "root",
+	password: "",
+	database: "oraclemarketcap"
 });
 
 
@@ -73,15 +73,49 @@ async function DoThings() {
 		// var regEvent1 = await getMostRecentRegistryEvent("NewProvider");
 		// var regEvent2 = await getMostRecentRegistryEvent("NewCurve");
 		var regEvent1 = await contracts.zapRegistry.getPastEvents("NewProvider", {fromBlock:0, toBlock:'latest'});
+		var regEvent2 = await contracts.zapRegistry.getPastEvents("NewCurve", {fromBlock:0, toBlock:'latest'});
 		var allEvents = [];
+		var strings = [];
+		// for (let i in regEvent2) {
+		// 	allEvents.push(regEvent2[i].returnValues);
+		// }
+
 		for (let i in regEvent1) {
 			// var prov = regEvent1[i].returnValues.provider;
 			// var title = regEvent1[i].returnValues.title;
 			// var endpt = regEvent1[i].returnValues.endpoint;
-			allEvents.push(regEvent1[i].returnValues);
+			providerAddr = regEvent1[i].returnValues.provider;
+			providerTitle = String(regEvent1[i].returnValues.title);
+			providerTitle = web3.utils.toUtf8(providerTitle);
+			// console.log(providerTitle);
+			sql = "INSERT INTO provider (providerAddress, providerTitle) VALUES ('" + providerAddr +"', '" + providerTitle+"')";
+			con.query(sql, function(err, result) {
+				if (err) throw err;
+				console.log("Inserted correctly");
+			});
+			for (let n in regEvent2) {
+				if (regEvent2[n].returnValues.provider == providerAddr) {
+					provider = regEvent2[n].returnValues.provider;
+					endptName = regEvent2[n].returnValues.endpoint;
+					constants = String(regEvent2[n].returnValues.constants);
+					parts = String(regEvent2[n].returnValues.parts);
+					dividers = String(regEvent2[n].returnValues.dividers);
+					sql = "INSERT INTO endpoint VALUES(providerAddress, endpointName, constant, part, divider) " +
+					"('" + provider +"', '"+ endptName+"', '"+constants+"', '"+parts+"', '"  + dividers+"')";
+					con.query(sql, function(err, result) {
+						if (err) throw err;
+						console.log("Inserted correctly");
+					});
+				}
+			}
+
+			// allEvents.push(regEvent1[i].returnValues);
+			// strings.push(String(regEvent1[i].returnValues.constants));
+
 		}
 		
-		console.log(allEvents);
+		// console.log(allEvents);
+		// console.log(strings);
 		// var regEvent2 = await contracts.zapRegistry.getPastEvents("NewCurve", {fromBlock:0, toBlock:'latest'});
 		// console.log(regEvent1);
 		// console.log(regEvent2);
