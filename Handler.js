@@ -79,6 +79,7 @@ async function DoThings() {
 		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
 		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
 
+
 		// var regEvent1 = await getMostRecentRegistryEvent("NewProvider");
 		// var regEvent2 = await getMostRecentRegistryEvent("NewCurve");
 		var regEvent1 = await contracts.zapRegistry.getPastEvents("NewProvider", {fromBlock:0, toBlock:'latest'});
@@ -110,12 +111,13 @@ async function DoThings() {
 					constants = String(regEvent2[n].returnValues.constants);
 					parts = String(regEvent2[n].returnValues.parts);
 					dividers = String(regEvent2[n].returnValues.dividers);
-					sql = "INSERT INTO endpoint VALUES(providerAddress, endpointName, constant, part, divider) " +
+					sql = "INSERT INTO endpoint (providerAddress, endpointName, constant, part, divider) VALUES" +
 					"('" + provider +"', '"+ endptName+"', '"+constants+"', '"+parts+"', '"  + dividers+"')";
 					con.query(sql, function(err, result) {
 						if (err) throw err;
 						console.log("Inserted correctly");
 					});
+
 				}
 			}
 
