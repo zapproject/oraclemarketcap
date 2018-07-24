@@ -6,12 +6,12 @@ var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
 // var client = redis.createClient();
 //can also customize port and ip: var client = redis.createClient(port, host);
 var mysql = require('mysql');
-// var con = mysql.createConnection({
-// 	host: "localhost",
-// 	user: "user",
-// 	password: "pass",
-// 	database: "mydb"
-// });
+var con = mysql.createConnection({
+	host: "localhost",
+	user: "user",
+	password: "pass",
+	database: "mydb"
+});
 
 
 async function getMostRecentRegistryEvent(eventToListenFor) {
@@ -38,10 +38,10 @@ async function DoThings() {
 		// 	console.log('Something went wrong ' + err);
 		// });
 
-		// con.connect(function(err) {
-		// 	if (err) throw err;
-		// 	console.log("Connected!");
-		// })
+		con.connect(function(err) {
+			if (err) throw err;
+			console.log("Connected!");
+		})
 
 		var accounts = await web3.eth.getAccounts();
 		var ethBalance = await web3.eth.getBalance(accounts[0]);
