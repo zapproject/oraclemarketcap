@@ -2,9 +2,17 @@ const contracts = require("./ContractsData");
 const assert = require("assert");
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
-var redis = require('redis');
-var client = redis.createClient();
+// var redis = require('redis');
+// var client = redis.createClient();
 //can also customize port and ip: var client = redis.createClient(port, host);
+var mysql = require('mysql');
+// var con = mysql.createConnection({
+// 	host: "localhost",
+// 	user: "user",
+// 	password: "pass",
+// 	database: "mydb"
+// });
+
 
 async function getMostRecentRegistryEvent(eventToListenFor) {
     try{
@@ -23,12 +31,18 @@ async function getMostRecentRegistryEvent(eventToListenFor) {
 
 async function DoThings() {
 	try {
-		client.on('connect', function() {
-			console.log('Redis client connected');
-		})
-		client.on('error', function(err) {
-			console.log('Something went wrong ' + err);
-		});
+		// client.on('connect', function() {
+		// 	console.log('Redis client connected');
+		// })
+		// client.on('error', function(err) {
+		// 	console.log('Something went wrong ' + err);
+		// });
+
+		// con.connect(function(err) {
+		// 	if (err) throw err;
+		// 	console.log("Connected!");
+		// })
+
 		var accounts = await web3.eth.getAccounts();
 		var ethBalance = await web3.eth.getBalance(accounts[0]);
 		ethBalance = web3.utils.fromWei(ethBalance.toString());
