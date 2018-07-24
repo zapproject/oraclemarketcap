@@ -1,9 +1,10 @@
 const express = require("express");
+
 var app = express();
 
 const PORT = 3000 //maybe make this an environment variable later?
 
-app.use(express.static('public'));
+app.set('view engine', 'ejs');
 
 var mysql = require('mysql');
 var con = mysql.createConnection({
@@ -15,7 +16,7 @@ var con = mysql.createConnection({
 
 
 app.get('/', (req,res) => { 
-	res.send("hello!"); 
+	res.render("index", {title: 'Express', items:['red', 'blue', 'yellow'] }); 
 });
 
 
@@ -25,7 +26,7 @@ app.get('/providers/:address', (req,res) => {
 	var query = "SELECT * FROM provider WHERE providerAddress='" + address+ "'";
 	con.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			res.render("index", {data: results });
 		}
 		else 
 			console.error(err);
@@ -52,7 +53,8 @@ app.get('/providers', async function(req,res) {
 	var query = "SELECT * FROM provider";
 	con.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			console.log(JSON.stringify(results, null, 2));
+			res.render("index", {data: results });
 		}
 		else 
 			console.error(err);
