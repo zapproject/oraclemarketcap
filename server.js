@@ -4,7 +4,7 @@ var app = express();
 
 const PORT = 3000 //maybe make this an environment variable later?
 
-app.set('view engine', 'ejs');
+app.use(express.static('views'));
 
 var mysql = require('mysql');
 var con = mysql.createConnection({
@@ -16,7 +16,7 @@ var con = mysql.createConnection({
 
 
 app.get('/', (req,res) => { 
-	res.render("index", {title: 'Express', items:['red', 'blue', 'yellow'] }); 
+	res.send('index.html'); 
 });
 
 
@@ -89,7 +89,7 @@ app.get('/providers', async function(req,res) {
 	con.query(query, function(err, results) {
 		if(!err) {
 			console.log(JSON.stringify(results, null, 2));
-			res.render("index", {data: results });
+			res.json({ data: results })
 		}
 		else 
 			console.error(err);
@@ -205,4 +205,5 @@ app.get('/endpoints', async function(req,res) {
 	})
 
 })
+
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
