@@ -11,7 +11,8 @@
 	</div>
 
 	<div id="endpoints"> 
-		<h2> Endpoints </h2>
+		<h2 
+		> Endpoints </h2>
 	</div>
 
 	<script>
@@ -19,7 +20,7 @@
 		var providersRequest = new XMLHttpRequest();
 	 	providersRequest.open('GET', 'http://localhost:3000/providers', true);
 	 	providersRequest.send()
-
+	 	providers.close()
 		providersRequest.onreadystatechange = function() {
 			if (providersRequest.readyState === XMLHttpRequest.DONE) {
 		      if (providersRequest.status === 200) {

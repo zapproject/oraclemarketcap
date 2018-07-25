@@ -2,6 +2,8 @@ const contracts = require("./ContractsData");
 const assert = require("assert");
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
+var zap = require('@zapjs/zaptoken');
+
 // var redis = require('redis');
 // var client = redis.createClient();
 //can also customize port and ip: var client = redis.createClient(port, host);
@@ -123,7 +125,7 @@ async function DoThings() {
 
 			// allEvents.push(regEvent1[i].returnValues);
 			// strings.push(String(regEvent1[i].returnValues.constants));
-
+  
 		}
 		
 		// console.log(allEvents);
