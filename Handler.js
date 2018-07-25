@@ -26,7 +26,7 @@ async function getMostRecentRegistryEvent(eventToListenFor) {
     }
 }
 
-async function DoThings() {
+async function main() {
 	try {
 		con.connect(function(err) {
 			if (err) throw err;
@@ -148,4 +148,4 @@ async function DoThings() {
 	
 }
 
-DoThings();
+main();

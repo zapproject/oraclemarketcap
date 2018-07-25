@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@zapjs/bondage": "^1.0.2",
+    "@zapjs/registry": "^1.0.3",
     "@zapjs/zaptoken": "^1.0.3",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
