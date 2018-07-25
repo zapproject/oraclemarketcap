@@ -2,9 +2,6 @@ const contracts = require("./ContractsData");
 const assert = require("assert");
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:9545"));
-// var redis = require('redis');
-// var client = redis.createClient();
-//can also customize port and ip: var client = redis.createClient(port, host);
 var mysql = require('mysql');
 var con = mysql.createConnection({
 	host: "localhost",
@@ -31,13 +28,6 @@ async function getMostRecentRegistryEvent(eventToListenFor) {
 
 async function DoThings() {
 	try {
-		// client.on('connect', function() {
-		// 	console.log('Redis client connected');
-		// })
-		// client.on('error', function(err) {
-		// 	console.log('Something went wrong ' + err);
-		// });
-
 		con.connect(function(err) {
 			if (err) throw err;
 			console.log("Connected!");
@@ -64,27 +54,33 @@ async function DoThings() {
 		var tokensForOwner = web3.utils.toBN("5000e18");
 		var tokensForProvider = web3.utils.toBN("3000e18");
 
-		var allo = await contracts.zapToken.methods.allocate(accounts[0],tokensForOwner).send({from: accounts[0]});
+		// var allo = await contracts.zapToken.methods.allocate(accounts[0],tokensForOwner).send({from: accounts[0]});
 		
-		var zapOwnApprove = await contracts.zapToken.methods.approve(contracts.zapBondage._address, approveTokens).send({from: accounts[0]});
-		var zapApprove = await contracts.zapToken.methods.approve(contracts.zapBondage._address, approveTokens).send({from: accounts[1]});
-		var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[4], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
-		var bond1 = await contracts.zapBondage.methods.bond(accounts[4], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var zapOwnApprove = await contracts.zapToken.methods.approve(contracts.zapBondage._address, approveTokens).send({from: accounts[0]});
+		// var zapApprove = await contracts.zapToken.methods.approve(contracts.zapBondage._address, approveTokens).send({from: accounts[1]});
+		// var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[4], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[4], gas: 6000000});
+		// var bond1 = await contracts.zapBondage.methods.bond(accounts[4], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var bond2 = await contracts.zapBondage.methods.bond(accounts[4], spec2, 100).send({from: accounts[0], gas: 6000000});
+		// var bond3 = await contracts.zapBondage.methods.bond(accounts[4], spec3, 100).send({from: accounts[0], gas: 6000000});
 
-		var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[5], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
-		var bond2 = await contracts.zapBondage.methods.bond(accounts[5], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[5], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[5], gas: 6000000});
+		// var bond1 = await contracts.zapBondage.methods.bond(accounts[5], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var bond2 = await contracts.zapBondage.methods.bond(accounts[5], spec2, 100).send({from: accounts[0], gas: 6000000});
+		// var bond3 = await contracts.zapBondage.methods.bond(accounts[5], spec3, 100).send({from: accounts[0], gas: 6000000});
 
-		var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[6], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
-		var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
-		var bond3 = await contracts.zapBondage.methods.bond(accounts[6], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var initProv = await contracts.zapRegistry.methods.initiateProvider(54321, title, spec1, params).send({from: accounts[6], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec1, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec2, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
+		// var initProvCurve = await contracts.zapRegistry.methods.initiateProviderCurve(spec3, constants, parts, dividers).send({from: accounts[6], gas: 6000000});
+		// var bond1 = await contracts.zapBondage.methods.bond(accounts[6], spec1, 100).send({from: accounts[0], gas: 6000000});
+		// var bond2 = await contracts.zapBondage.methods.bond(accounts[6], spec2, 100).send({from: accounts[0], gas: 6000000});
+		// var bond3 = await contracts.zapBondage.methods.bond(accounts[6], spec3, 100).send({from: accounts[0], gas: 6000000});
 
 		// var regEvent1 = await getMostRecentRegistryEvent("NewProvider");
 		// var regEvent2 = await getMostRecentRegistryEvent("NewCurve");
@@ -92,18 +88,11 @@ async function DoThings() {
 		var regEvent2 = await contracts.zapRegistry.getPastEvents("NewCurve", {fromBlock:0, toBlock:'latest'});
 		var allEvents = [];
 		var strings = [];
-		// for (let i in regEvent2) {
-		// 	allEvents.push(regEvent2[i].returnValues);
-		// }
 
 		for (let i in regEvent1) {
-			// var prov = regEvent1[i].returnValues.provider;
-			// var title = regEvent1[i].returnValues.title;
-			// var endpt = regEvent1[i].returnValues.endpoint;
 			providerAddr = regEvent1[i].returnValues.provider;
 			providerTitle = String(regEvent1[i].returnValues.title);
 			providerTitle = web3.utils.toUtf8(providerTitle);
-			// console.log(providerTitle);
 			sql = "INSERT INTO provider (providerAddress, providerTitle) VALUES ('" + providerAddr +"', '" + providerTitle+"')";
 			con.query(sql, function(err, result) {
 				if (err) throw err;
@@ -128,42 +117,27 @@ async function DoThings() {
 			}
 
 		}
-		provAddrData = [];
-		endptData = [];
-		sql = "SELECT providerAddress FROM provider";
-		con.query(sql, function(err, result) {
+
+		sql = "SELECT * FROM endpoint";
+		con.query(sql, async function(err, result) {
 			if (err) throw err;
 			for (let i in result) {
-				provAddrData.push(result[i].providerAddress);
-			}
-			for (let i in provAddrData) {
-				sql = "SELECT * FROM endpoint WHERE providerAddress='" + provAddrData[i] + "'";	
-				// console.log(sql);
-				con.query(sql, async function(err, result) {
+				endptName = result[i].endpointName;
+				endptNameHex = web3.utils.utf8ToHex(endptName);
+				provAddr = result[i].providerAddress;
+				var numDots = await contracts.zapBondage.methods.getDotsIssued(provAddr,endptNameHex).call();
+				var dotCost = await contracts.zapBondage.methods.currentCostOfDot(provAddr,endptNameHex,1).call();
+				var calcZap = await contracts.zapBondage.methods.calcZapForDots(provAddr,endptNameHex,numDots).call();
+				sql1 = await "UPDATE endpoint SET zapValue="+calcZap+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddr+"'";				
+				sql2 = await "UPDATE endpoint SET dotValue="+dotCost+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddr+"'";
+				await con.query(sql1, function(err, result) {
 					if (err) throw err;
-					for (let n in result) {
-						endptName = result[n].endpointName;
-						endptNameHex = web3.utils.utf8ToHex(endptName);
-						var numDots = await contracts.zapBondage.methods.getDotsIssued(provAddrData[i],endptNameHex).call();
-						console.log(numDots);
-						var dotCost = await contracts.zapBondage.methods.currentCostOfDot(provAddrData[i],endptNameHex,1).call();
-						var calcZap = await contracts.zapBondage.methods.calcZapForDots(provAddrData[i],endptNameHex,numDots).call();
-						console.log(dotCost);
-						console.log(calcZap);
-						sql = "UPDATE endpoint SET zapValue="+calcZap+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddrData[i]+"'";
-						con.query(sql, function(err, result) {
-							if (err) throw err;
-						});
-						console.log("updated zap value");
-						sql = "UPDATE endpoint SET dotValue="+dotCost+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddrData[i]+"'";
-						con.query(sql, function(err, result) {
-							if (err) throw err;
-						});
-						console.log("updated dot value");
-					}
-					// console.log(result);
-			});
-		};
+				});
+				await con.query(sql2, function(err, result) {
+					if (err) throw err;
+				});
+				console.log("iteration "+i+" finished");
+			}
 		});
 
 	} catch(error) {
