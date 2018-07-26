@@ -7,20 +7,18 @@ On mysql
 CREATE DATABASE oraclemarketcap
 USE oraclemarketcap
 
-CREATE TABLE endpoint(endpointID int unsigned AUTO_INCREMENT primary key,
-providerAddress VARCHAR(50) NOT NULL,
-endpointName VARCHAR(50) NOT NULL,
-zapValue int,
-dotValue int,
+CREATE TABLE endpoints(endpoint_id int unsigned AUTO_INCREMENT primary key,
+provider_address VARCHAR(50) NOT NULL,
+endpoint_name VARCHAR(50) NOT NULL,
+zap_value int,
+dot_value int,
 timestamp timestamp,
-constant VARCHAR(100) NOT NULL,
-part VARCHAR(100) NOT NULL,
-divider VARCHAR(100) NOT NULL); 
+constants VARCHAR(100) NOT NULL,
+parts VARCHAR(100) NOT NULL,
+dividers VARCHAR(100) NOT NULL);
 
-CREATE TABLE provider(
-providerAddress VARCHAR(50) PRIMARY KEY UNIQUE,
-providerTitle VARCHAR(50) NOT NULL,
-totalZapValue int,
+CREATE TABLE providers(
+provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
+provider_title VARCHAR(50) NOT NULL,
+total_zap_value int,
 timestamp timestamp);
-
-ALTER TABLE endpoint ADD CONSTRAINT FOREIGN KEY (providerAddress) REFERENCES provider (providerAddress) ON DELETE CASCADE ON UPDATE CASCADE;
