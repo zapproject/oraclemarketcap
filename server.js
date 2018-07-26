@@ -22,7 +22,7 @@ app.get('/', (req,res) => {
 app.get('/providers/address/:address', (req,res) => {
 	var address = req.params.address;
 	console.log(address);
-	var query = "SELECT * FROM provider WHERE providerAddress='" + address+ "'";
+	var query = "SELECT * FROM providers WHERE provider_address=" + con.escape(address);
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -37,7 +37,7 @@ app.get('/providers/address/:address', (req,res) => {
 app.get('/providers/title/:title', (req,res) => {
 	var title = req.params.title;
 	console.log(title);
-	var query = "SELECT * FROM provider WHERE providerTitle='" + title + "'";
+	var query = "SELECT * FROM providers WHERE provider_title=" + con.escape(title) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -48,7 +48,7 @@ app.get('/providers/title/:title', (req,res) => {
 })
 app.get('/providers/asc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM provider WHERE totalZapValue IS NOT NULL ORDER BY totalZapValue asc";
+	var query = "SELECT * FROM providers WHERE total_zap_value IS NOT NULL ORDER BY total_zap_value asc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -60,7 +60,7 @@ app.get('/providers/asc', async function(req,res) {
 })
 app.get('/providers/desc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM provider WHERE totalZapValue IS NOT NULL ORDER BY totalZapValue desc";
+	var query = "SELECT * FROM providers WHERE total_zap_value IS NOT NULL ORDER BY total_zap_value desc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -72,7 +72,7 @@ app.get('/providers/desc', async function(req,res) {
 })
 app.get('/providers/lastupdated', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM provider ORDER BY timestamp DESC";
+	var query = "SELECT * FROM providers ORDER BY timestamp DESC";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -84,7 +84,7 @@ app.get('/providers/lastupdated', async function(req,res) {
 })
 app.get('/providers', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM provider";
+	var query = "SELECT * FROM providers";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -98,7 +98,7 @@ app.get('/providers', async function(req,res) {
 app.get('/endpoints/address/:address', (req,res) => {
 	var address = req.params.address;
 	console.log(address);
-	var query = "SELECT * FROM endpoint WHERE providerAddress='" + address + "'";
+	var query = "SELECT * FROM endpoints WHERE provider_address=" + con.escape(address) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -110,7 +110,7 @@ app.get('/endpoints/address/:address', (req,res) => {
 app.get('/endpoints/name/:name', (req,res) => {
 	var name = req.params.name;
 	console.log(name);
-	var query = "SELECT * FROM endpoint WHERE endpointName='" + name + "'";
+	var query = "SELECT * FROM endpoints WHERE endpoint_name=" + con.escape(name) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -122,7 +122,7 @@ app.get('/endpoints/name/:name', (req,res) => {
 app.get('/endpoints/endpoint/:id', (req,res) => {
 	var id = req.params.id;
 	console.log(id);
-	var query = "SELECT * FROM endpoint WHERE endpointID='" + id + "'";
+	var query = "SELECT * FROM endpoints WHERE endpoint_id=" + con.escape(id) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -133,7 +133,7 @@ app.get('/endpoints/endpoint/:id', (req,res) => {
 })
 app.get('/endpoints/zapasc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint WHERE zapValue IS NOT NULL ORDER BY zapValue asc";
+	var query = "SELECT * FROM endpoints WHERE zap_value IS NOT NULL ORDER BY zap_value asc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -145,7 +145,7 @@ app.get('/endpoints/zapasc', async function(req,res) {
 })
 app.get('/endpoints/zapdesc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint WHERE zapValue IS NOT NULL ORDER BY zapValue desc";
+	var query = "SELECT * FROM endpoints WHERE zap_value IS NOT NULL ORDER BY zap_value desc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -157,7 +157,7 @@ app.get('/endpoints/zapdesc', async function(req,res) {
 })
 app.get('/endpoints/dotasc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint WHERE dotValue IS NOT NULL ORDER BY dotValue asc";
+	var query = "SELECT * FROM endpoints WHERE dot_value IS NOT NULL ORDER BY dot_value asc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -169,7 +169,7 @@ app.get('/endpoints/dotasc', async function(req,res) {
 })
 app.get('/endpoints/dotdesc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint WHERE dotValue IS NOT NULL ORDER BY dotValue desc";
+	var query = "SELECT * FROM endpoints WHERE dot_value IS NOT NULL ORDER BY dot_value desc";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -181,7 +181,7 @@ app.get('/endpoints/dotdesc', async function(req,res) {
 })
 app.get('/endpoints/lastupdated', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint ORDER BY timestamp DESC";
+	var query = "SELECT * FROM endpoints ORDER BY timestamp DESC";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -193,7 +193,7 @@ app.get('/endpoints/lastupdated', async function(req,res) {
 })
 app.get('/endpoints', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoint";
+	var query = "SELECT * FROM endpoints";
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
