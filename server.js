@@ -22,7 +22,7 @@ app.get('/', (req,res) => {
 app.get('/providers/address/:address', (req,res) => {
 	var address = req.params.address;
 	console.log(address);
-	var query = "SELECT * FROM provider WHERE providerAddress='" + address+ "'";
+	var query = "SELECT * FROM provider WHERE providerAddress=" + con.escape(address);
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -37,7 +37,7 @@ app.get('/providers/address/:address', (req,res) => {
 app.get('/providers/title/:title', (req,res) => {
 	var title = req.params.title;
 	console.log(title);
-	var query = "SELECT * FROM provider WHERE providerTitle='" + title + "'";
+	var query = "SELECT * FROM provider WHERE providerTitle=" + con.escape(title) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -98,7 +98,7 @@ app.get('/providers', async function(req,res) {
 app.get('/endpoints/address/:address', (req,res) => {
 	var address = req.params.address;
 	console.log(address);
-	var query = "SELECT * FROM endpoint WHERE providerAddress='" + address + "'";
+	var query = "SELECT * FROM endpoint WHERE providerAddress=" + con.escape(address) ;
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -110,7 +110,7 @@ app.get('/endpoints/address/:address', (req,res) => {
 app.get('/endpoints/name/:name', (req,res) => {
 	var name = req.params.name;
 	console.log(name);
-	var query = "SELECT * FROM endpoint WHERE endpointName='" + name + "'";
+	var query = "SELECT * FROM endpoint WHERE endpointName=" + con.escape(name);
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -122,7 +122,7 @@ app.get('/endpoints/name/:name', (req,res) => {
 app.get('/endpoints/endpoint/:id', (req,res) => {
 	var id = req.params.id;
 	console.log(id);
-	var query = "SELECT * FROM endpoint WHERE endpointID='" + id + "'";
+	var query = "SELECT * FROM endpoint WHERE endpointID=" + con.escape(id);
 	con.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
