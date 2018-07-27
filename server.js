@@ -29,6 +29,7 @@ app.get('/', (req,res) => {
 app.get('/providers/address/:address', (req,res) => {
 	var address = req.params.address;
 	console.log(address);
+
 	var query = "SELECT * FROM providers WHERE provider_address=?";
 	pool.query(query, address, function(err, results) {
 		if(!err) {
