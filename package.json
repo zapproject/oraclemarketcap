@@ -25,6 +25,6 @@
     "truffle-core": "^4.1.13",
     "truffle-hdwallet-provider-privkey": "^0.2.0",
     "uuid-parse": "^1.0.0",
-    "web3": "^1.0.0-beta.34"
+    "web3": "^1.0.0-beta.35"
   }
 }
