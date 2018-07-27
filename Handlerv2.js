@@ -1,13 +1,15 @@
-const web3 = require('web3');
+var Web3 = require("web3");
 
 const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
 const {Artifacts} = require('@zapjs/artifacts');
 
 const INFURA_URL = "https://kovan.infura.io/xeb916AFjrcttuQlezyq";
+var web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
 
-var registry = new ZapRegistry({networkId: 42, networkProvider: new web3.providers.HttpProvider(INFURA_URL)});
-var bondage = new ZapBondage({networkId: 42, networkProvider: new web3.providers.HttpProvider(INFURA_URL)});
+
+var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
+var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
 
 var mysql = require('mysql');
 var con = mysql.createConnection({
@@ -79,6 +81,7 @@ async function listenNewProvider() {
 		// var providerKey = provider.publicKey;
 
 	})
+	.catch(console.error);
 }
 
 async function listenNewCurve() {
@@ -100,6 +103,7 @@ async function listenNewCurve() {
 		// });
 
 	})
+	.catch(console.error);
 }
 
 async function main() {
@@ -118,7 +122,7 @@ async function main() {
 		var spec1 = web3.utils.utf8ToHex("test");
 		var params = [ "param1" , "param2" ];
 		var title = web3.utils.utf8ToHex("TestingNodePackage");
-
+		var filters="";
 		registry.listenNewProvider(filters, console.log());
 		registry.listenNewCurve(filters, console.log());
 
@@ -127,18 +131,18 @@ async function main() {
 			title: "TestNodePackage", 
 			endpoint: "endpoint1", 
 			endpoint_params: params, 
-			from: "0x5Df6ACc490a34f30E20c740D1a3Adf23Dc4D48A2"
+			from: "0x5Df6ACc490a34f30E20c740D1a3Adf23Dc4D48A2",
+			gas:6000000
 		})
 		.then(result => {
 			console.log(result);
 		})
-
+		.catch(console.error);
 		//await getEndpoints();
 	}
 	catch(error) {
 		console.error(error);
 	}
 }
-
 main();
 
