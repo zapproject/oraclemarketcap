@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@zapjs/artifacts": "^1.0.4",
     "@zapjs/bondage": "^1.0.2",
     "@zapjs/registry": "^1.0.3",
     "@zapjs/zaptoken": "^1.0.3",
@@ -21,6 +22,7 @@
     "chai-bignumber": "^2.0.2",
     "mysql": "^2.16.0",
     "truffle": "^4.1.13",
+    "truffle-core": "^4.1.13",
     "truffle-hdwallet-provider-privkey": "^0.2.0",
     "uuid-parse": "^1.0.0",
     "web3": "^1.0.0-beta.34"

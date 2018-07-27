@@ -93,7 +93,7 @@ async function main() {
 			providerAddr = regEvent1[i].returnValues.provider;
 			providerTitle = String(regEvent1[i].returnValues.title);
 			providerTitle = web3.utils.toUtf8(providerTitle);
-			sql = "INSERT INTO provider (providerAddress, providerTitle) VALUES ('" + providerAddr +"', '" + providerTitle+"')";
+			sql = "INSERT INTO providers (provider_address, provider_title) VALUES (" + con.escape(providerAddr) +", " + con.escape(providerTitle)+")";
 			con.query(sql, function(err, result) {
 				if (err) throw err;
 				console.log("Inserted correctly");
@@ -106,8 +106,8 @@ async function main() {
 					constants = String(regEvent2[n].returnValues.constants);
 					parts = String(regEvent2[n].returnValues.parts);
 					dividers = String(regEvent2[n].returnValues.dividers);
-					sql = "INSERT INTO endpoint (providerAddress, endpointName, constant, part, divider) VALUES" +
-					"('" + provider +"', '"+ endptName+"', '"+constants+"', '"+parts+"', '"  + dividers+"')";
+					sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES" +
+					"(" + con.escape(provider) +", " + con.escape(endptName)+", " + con.escape(constants)+", " + con.escape(parts)+", " + con.escape(dividers)+")";
 					con.query(sql, function(err, result) {
 						if (err) throw err;
 						console.log("Inserted correctly");
@@ -118,7 +118,7 @@ async function main() {
 
 		}
 
-		sql = "SELECT * FROM endpoint";
+		sql = "SELECT * FROM endpoints";
 		con.query(sql, async function(err, result) {
 			if (err) throw err;
 			for (let i in result) {
@@ -128,8 +128,8 @@ async function main() {
 				var numDots = await contracts.zapBondage.methods.getDotsIssued(provAddr,endptNameHex).call();
 				var dotCost = await contracts.zapBondage.methods.currentCostOfDot(provAddr,endptNameHex,1).call();
 				var calcZap = await contracts.zapBondage.methods.calcZapForDots(provAddr,endptNameHex,numDots).call();
-				sql1 = await "UPDATE endpoint SET zapValue="+calcZap+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddr+"'";				
-				sql2 = await "UPDATE endpoint SET dotValue="+dotCost+" WHERE endpointName='"+endptName+"' AND providerAddress="+"'"+provAddr+"'";
+				sql1 = await "UPDATE endpoints SET zap_value="+con.escape(calcZap)+" WHERE endpoint_name=" + con.escape(endptName)+" AND provider_address=" + con.escape(provAddr);				
+				sql2 = await "UPDATE endpoints SET dot_value="+con.escape(dotCost)+" WHERE endpoint_name=" + con.escape(endptName)+" AND provider_address=" + con.escape(provAddr);
 				await con.query(sql1, function(err, result) {
 					if (err) throw err;
 				});
