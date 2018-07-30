@@ -1,8 +1,8 @@
 var Web3 = require("web3");
+const util = require('util');
 
 const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
-//const {ZapProvider} = require('@zapjs/provider');
 
 const {Artifacts} = require('@zapjs/artifacts');
 
@@ -10,9 +10,8 @@ const INFURA_URL = "https://kovan.infura.io/xeb916AFjrcttuQlezyq";
 var web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
 
 
-var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
+var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
-//var provider = new ZapProvider({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
 
 
 
@@ -41,12 +40,12 @@ async function getAllProviders() {
 		providerTitle = web3.utils.toUtf8(providerTitle);
 		var providerAddress = provider.oracleAddress;
 		var providerKey = provider.publicKey;
-		//sql = "INSERT INTO providers (provider_address, provider_title) VALUES (" + con.escape(providerAddress) +", " + con.escape(providerTitle)+")";
+		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (" + con.escape(providerAddress) +", " + con.escape(providerTitle)+")";
 		
-		// con.query(sql, function(err, result) {
-		// 		if (err) throw err;
-		// 		console.log("Inserted correctly");
-		// });
+		con.query(sql, function(err, result) {
+				if (err) throw err;
+				console.log("Inserted correctly");
+		});
 		console.log(provider);
 		// console.log(providerAddress);
 		// console.log(providerTitle);
@@ -57,35 +56,39 @@ async function getAllProviders() {
 	} while(i != 0);
 }
 
-// async function getEndpoints() {
-// 	var getSql = "SELECT * FROM endpoints";
-// 	con.query(getSql, async function(err, result) {
-// 			if (err) throw err;
-// 			console.log(result);
-// 			for (let i in result) {
-// 				endptName = result[i].endpointName;
-// 				endptNameHex = web3.utils.utf8ToHex(endptName);
-// 				provAddr = result[i].providerAddress;
-// 				var numDots = await ZapBondage.getDotsIssued(provAddr,endptNameHex);
-// 				var dotCost = await ZapBondage.currentCostOfDot(provAddr,endptNameHex,1);
-// 				var calcZap = await ZapBondage.calcZapForDots(provAddr,endptNameHex,numDots);
-// 				sql1 = await "UPDATE endpoints SET zap_value="+con.escape(calcZap)+" WHERE endpoint_name=" + con.escape(endptName)+" AND provider_address=" + con.escape(provAddr);				
-// 				sql2 = await "UPDATE endpoints SET dot_value="+con.escape(dotCost)+" WHERE endpoint_name=" + con.escape(endptName)+" AND provider_address=" + con.escape(provAddr);
-// 				await con.query(sql1, function(err, result) {
-// 					if (err) throw err;
-// 				});
-// 				await con.query(sql2, function(err, result) {
-// 					if (err) throw err;
-// 				});
-// 				console.log("iteration "+i+" finished");
-// 			}
-// 		});
-// }
+async function getBoundZapEndpoints() {
+	var getSql = "SELECT * FROM endpoints";
+	pool.query(getSql, async function(err, result) {
+			if (err) throw err;
+			console.log(result);
+			for (let i in result) {
+				endpointName = result[i].endpointName;
+				endpointNameHex = web3.utils.utf8ToHex(endpointName);
+				providerAddress = result[i].providerAddress;
+
+				var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpointName });
+				var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:1 });
+				var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endptNameHex, dots: numDots });
+
+				sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=";				
+				sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+				
+				await con.query(sql1, [calcZap, endptName, provAddr], function(err, result) {
+					if (err) throw err;
+				});
+				await con.query(sql2, [dotCost, endptName, provAddr], function(err, result) {
+					if (err) throw err;
+				});
+				console.log("iteration "+i+" finished");
+			}
+		});
+}
 
 
 async function listenNewProvider() {
-	registry.listenNewProvider()
-	.then(provider => {
+	var filters = '';
+	registry.listenNewProvider(filters, function(error, endpoint) {
+		if(error) throw(error);
 		console.log(provider);
 		
 		var providerTitle = provider.title;
@@ -102,12 +105,12 @@ async function listenNewProvider() {
 			}
 		})
 	})
-	.catch(console.error);
 }
 
 async function listenNewCurve() {
-	registry.listenNewCurve()
-	.then(endpoint => {
+	var filters = '';
+	registry.listenNewCurve(filters, function(error, endpoint) {
+		if(error) throw(error);
 		console.log(endpoint);
 		
 		provider = endpoint.provider;
@@ -126,14 +129,26 @@ async function listenNewCurve() {
 			}
 		})
 	})
-	.catch(console.error);
+
 }
 
 async function main() {
 	try {
+
+		//prove that node package works
+		registry.getProviderTitle("0x014a87cc7954dd50a566a791e4975abaa49f8745")
+		.then(title => console.log(title));
+
+		//UNCOMMENT THIS LINE TO POPULATE PROVIDERS TABLE!!!!
 		//getAllProviders();
-		// registry.getProviderTitle("0x014a87cc7954dd50a566a791e4975abaa49f8745")
-		// .then(title => console.log(title));
+		
+
+		//UNTESTED CODE
+		getBoudZapEndpoints();
+		listenNewProvider();
+		listenNewCurve();
+
+
 
 		registry.getNextEndpointParams({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", index: 0 })
 		.then(result => {
@@ -141,12 +156,7 @@ async function main() {
 		})
 		.catch(console.error);
 
-		registry.getProviderCurve({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart" })
-		.then(result => {
-			console.log("Curve: " + result);
-		})
-		.catch(console.error);
-
+		//test bondage function calls
 		bondage.calcZapForDots({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", dots: 1 })
 		.then(result => {
 			console.log("doots: " + result);
@@ -164,6 +174,8 @@ async function main() {
 			console.log("doooooooooooots: " + result);
 		})
 		.catch(console.error);
+
+
 		// var constants = [2,2,0,5,0,0,3,1,1];
 		// var parts = [0,5,5,100];
 		// var dividers = [2,3];
