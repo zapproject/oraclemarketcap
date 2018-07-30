@@ -141,69 +141,38 @@ async function main() {
 
 		//UNCOMMENT THIS LINE TO POPULATE PROVIDERS TABLE!!!!
 		//getAllProviders();
+
+		var constants = [2,2,0,5,0,0,3,1,1];
+		var parts = [0,5,5,100];
+		var dividers = [2,3];
+
+		var key = web3.utils.toBN(111);
+		var gasLimit = web3.utils.toBN(6000000);
 		
+		console.log(key);
+		console.log(gasLimit);
 
-		//UNTESTED CODE
-		getBoundZapEndpoints();
-		// listenNewProvider();
-		// listenNewCurve();
+		var spec1 = web3.utils.utf8ToHex("test");
+		var params = [ "param1" , "param2" ];
+		var title = web3.utils.utf8ToHex("TestingNodePackage");
+		var filters= "";
 
+		var metamaskWallet = "0x5Df6ACc490a34f30E20c740D1a3Adf23Dc4D48A2";
 
-		registry.getNextEndpointParams({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", index: 0 })
-		.then(result => {
-			console.log("Result 1: " + result);
+		registry.listenNewProvider(filters, console.log());
+		registry.listenNewCurve(filters, console.log());
+
+		registry.initiateProvider({
+			public_key: 123,
+			title: "TestNodePackage", 
+			endpoint: "endpoint1", 
+			endpoint_params: params, 
+			from: metamaskWallet,
+			gas: 6000000
 		})
-		.catch(console.error);
-
-		//test bondage function calls
-		bondage.calcZapForDots({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", dots: 1 })
 		.then(result => {
-			console.log("doots: " + result);
+			console.log(result);
 		})
-		.catch(console.error);
-
-		bondage.calcZapForDots({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", dots: 1 })
-		.then(result => {
-			console.log("doots: " + result);
-		})
-		.catch(console.error);
-
-		bondage.calcBondRate({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", zapNum: 200000000000000000})
-		.then(result => {
-			console.log("doooooooooooots: " + result);
-		})
-		.catch(console.error);
-
-
-		// var constants = [2,2,0,5,0,0,3,1,1];
-		// var parts = [0,5,5,100];
-		// var dividers = [2,3];
-
-		// var key = web3.utils.toBN(111);
-		// var gasLimit = web3.utils.toBN(6000000);
-		
-		// console.log(key);
-		// console.log(gasLimit);
-
-		// var spec1 = web3.utils.utf8ToHex("test");
-		// var params = [ "param1" , "param2" ];
-		// var title = web3.utils.utf8ToHex("TestingNodePackage");
-		// var filters= "";
-
-		// registry.listenNewProvider(filters, console.log());
-		// registry.listenNewCurve(filters, console.log());
-
-		// registry.initiateProvider({
-		// 	public_key: 123,
-		// 	title: "TestNodePackage", 
-		// 	endpoint: "endpoint1", 
-		// 	endpoint_params: params, 
-		// 	from: "0x5Df6ACc490a34f30E20c740D1a3Adf23Dc4D48A2",
-		// 	gas: 6000000
-		// })
-		// .then(result => {
-		// 	console.log(result);
-		// })
 
 	}
 	catch(error) {
