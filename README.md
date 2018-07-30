@@ -21,4 +21,4 @@ CREATE TABLE providers(
 provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
 provider_title VARCHAR(50) NOT NULL,
 total_zap_value int,
-timestamp timestamp);
+timestamp timestamp); 
