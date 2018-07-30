@@ -13,8 +13,6 @@ var web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
 var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
 
-
-
 var mysql = require('mysql');
 var pool = mysql.createPool({
 	host: "localhost",
@@ -144,10 +142,9 @@ async function main() {
 		
 
 		//UNTESTED CODE
-		getBoudZapEndpoints();
+		getBoundZapEndpoints();
 		listenNewProvider();
 		listenNewCurve();
-
 
 
 		registry.getNextEndpointParams({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", index: 0 })
