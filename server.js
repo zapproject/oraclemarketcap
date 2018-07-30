@@ -22,9 +22,25 @@ pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
 pool.query = util.promisify(pool.query);
 
 app.get('/', (req,res) => { 
-	res.send("hello!"); 
+	res.send("index.html"); 
 });
 
+//=========================================================//
+//	Providers API										   //
+//=========================================================//
+
+app.get('/providers', async function(req,res) {
+	console.log("recieved req");
+	var query = "SELECT * FROM providers";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			console.error(err);
+	})
+
+})
 
 app.get('/providers/address/:address', (req,res) => {
 	var address = req.params.address;
@@ -57,7 +73,7 @@ app.get('/providers/title/:title', (req,res) => {
 app.get('/providers/asc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM providers WHERE total_zap_value IS NOT NULL ORDER BY total_zap_value asc";
-	pool.query(query, function(err, results) {
+	pool.query(query,function(err, results) {
 		if(!err) {
 			res.json({data: results});
 		}
@@ -90,9 +106,13 @@ app.get('/providers/lastupdated', async function(req,res) {
 	})
 
 })
-app.get('/providers', async function(req,res) {
+
+//=========================================================//
+//	Endpoints API										   //
+//=========================================================//
+app.get('/endpoints', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM providers";
+	var query = "SELECT * FROM endpoints";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -199,16 +219,5 @@ app.get('/endpoints/lastupdated', async function(req,res) {
 	})
 
 })
-app.get('/endpoints', async function(req,res) {
-	console.log("recieved req");
-	var query = "SELECT * FROM endpoints";
-	pool.query(query, function(err, results) {
-		if(!err) {
-			res.json({data: results});
-		}
-		else 
-			console.error(err);
-	})
 
-})
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
