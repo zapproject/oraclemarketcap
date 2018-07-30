@@ -10,7 +10,7 @@ const INFURA_URL = "https://kovan.infura.io/xeb916AFjrcttuQlezyq";
 var web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
 
 
-var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
+var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
 
 var mysql = require('mysql');
@@ -38,9 +38,9 @@ async function getAllProviders() {
 		providerTitle = web3.utils.toUtf8(providerTitle);
 		var providerAddress = provider.oracleAddress;
 		var providerKey = provider.publicKey;
-		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (" + con.escape(providerAddress) +", " + con.escape(providerTitle)+")";
+		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?)";
 		
-		con.query(sql, function(err, result) {
+		pool.query(sql, [providerAddress, providerTitle],function(err, result) {
 				if (err) throw err;
 				console.log("Inserted correctly");
 		});
@@ -58,23 +58,25 @@ async function getBoundZapEndpoints() {
 	var getSql = "SELECT * FROM endpoints";
 	pool.query(getSql, async function(err, result) {
 			if (err) throw err;
+			if(result.length < 1)
+				return;
 			console.log(result);
 			for (let i in result) {
 				endpointName = result[i].endpointName;
-				endpointNameHex = web3.utils.utf8ToHex(endpointName);
+				//endpointNameHex = web3.utils.utf8ToHex(endpointName);
 				providerAddress = result[i].providerAddress;
 
-				var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpointName });
+				var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
 				var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:1 });
-				var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endptNameHex, dots: numDots });
+				var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
-				sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=";				
+				sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
 				sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
 				
-				await con.query(sql1, [calcZap, endptName, provAddr], function(err, result) {
+				await pool.query(sql1, [calcZap, endptName, provAddr], function(err, result) {
 					if (err) throw err;
 				});
-				await con.query(sql2, [dotCost, endptName, provAddr], function(err, result) {
+				await pool.query(sql2, [dotCost, endptName, provAddr], function(err, result) {
 					if (err) throw err;
 				});
 				console.log("iteration "+i+" finished");
@@ -143,8 +145,8 @@ async function main() {
 
 		//UNTESTED CODE
 		getBoundZapEndpoints();
-		listenNewProvider();
-		listenNewCurve();
+		// listenNewProvider();
+		// listenNewCurve();
 
 
 		registry.getNextEndpointParams({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", index: 0 })
