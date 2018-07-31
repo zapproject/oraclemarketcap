@@ -6,12 +6,12 @@ const {ZapBondage} = require('@zapjs/bondage');
 
 const {Artifacts} = require('@zapjs/artifacts');
 
-const INFURA_URL = "https://kovan.infura.io/xeb916AFjrcttuQlezyq";
-var web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
+//const INFURA_URL = "https://kovan.infura.io/xeb916AFjrcttuQlezyq";
+const INFURA_URL = "wss://kovan.infura.io/ws";
 
-
-var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
-var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.HttpProvider(INFURA_URL)});
+var web3 = new Web3(new Web3.providers.WebsocketProvider(INFURA_URL));
+var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
+var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 
 var mysql = require('mysql');
 var pool = mysql.createPool({
@@ -44,10 +44,10 @@ async function getAllProviders() {
 				if (err) throw err;
 				console.log("Inserted correctly");
 		});
-		console.log(provider);
-		// console.log(providerAddress);
-		// console.log(providerTitle);
-		// console.log(providerKey);
+		console.log("Provider " + i + ":");
+		console.log("\t"+providerAddress);
+		console.log("\t"+providerTitle);
+		console.log("\t"+providerKey);
 
 		i = parseInt(provider.nextIndex);
 
@@ -86,15 +86,17 @@ async function getBoundZapEndpoints() {
 
 
 async function listenNewProvider() {
-	var filters = '';
-	registry.listenNewProvider(filters, function(error, endpoint) {
+	registry.listenNewProvider({}, function(error, event) {
 		if(error) throw(error);
-		console.log(provider);
 		
-		var providerTitle = provider.title;
+		console.log(event);
+		var log = event.returnValues;
+		console.log("Providers returnValues" + log);
+
+		var providerTitle = log.title;
 		providerTitle = web3.utils.toUtf8(providerTitle);
-		var providerAddress = provider.oracleAddress;
-		var providerKey = provider.publicKey;
+		var providerAddress = log.provider;
+		//var providerKey = log.publicKey;
 
 		var sql = "INSERT INTO providers (provider_address, provider_title) VALUES(?, ?)"
 		pool.query(sql, [providerAddress, providerTitle], function(error, result) {
@@ -108,17 +110,19 @@ async function listenNewProvider() {
 }
 
 async function listenNewCurve() {
-	var filters = '';
-	registry.listenNewCurve(filters, function(error, endpoint) {
+	registry.listenNewCurve({}, function(error, event) {
 		if(error) throw(error);
-		console.log(endpoint);
-		
-		provider = endpoint.provider;
-		endpointName = String(endpoint.endpoint);
+		console.log(event);
+
+		var log = event.returnValues;
+		console.log("Try to pull only returnValues:" + log);
+
+		provider = log.provider;
+		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
-		constants = String(endpoint.constants);
-		parts = String(endpoint.parts);
-		dividers = String(endpoint.dividers);
+		constants = String(log.constants);
+		parts = String(log.parts);
+		dividers = String(log.dividers);
 
 		var sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES(?,?,?,?,?)"
 		pool.query(sql, [provider, endpointName, constants, parts, dividers], function(error, result) {
@@ -140,71 +144,10 @@ async function main() {
 		.then(title => console.log(title));
 
 		//UNCOMMENT THIS LINE TO POPULATE PROVIDERS TABLE!!!!
-		//getAllProviders();
-		
+		getAllProviders();
 
-		//UNTESTED CODE
-		getBoundZapEndpoints();
-		// listenNewProvider();
-		// listenNewCurve();
-
-
-		registry.getNextEndpointParams({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", index: 0 })
-		.then(result => {
-			console.log("Result 1: " + result);
-		})
-		.catch(console.error);
-
-		//test bondage function calls
-		bondage.calcZapForDots({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", dots: 1 })
-		.then(result => {
-			console.log("doots: " + result);
-		})
-		.catch(console.error);
-
-		bondage.calcZapForDots({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", dots: 1 })
-		.then(result => {
-			console.log("doots: " + result);
-		})
-		.catch(console.error);
-
-		bondage.calcBondRate({ provider: "0x014a87cc7954dd50a566a791e4975abaa49f8745", endpoint: "loomdart", zapNum: 200000000000000000})
-		.then(result => {
-			console.log("doooooooooooots: " + result);
-		})
-		.catch(console.error);
-
-
-		// var constants = [2,2,0,5,0,0,3,1,1];
-		// var parts = [0,5,5,100];
-		// var dividers = [2,3];
-
-		// var key = web3.utils.toBN(111);
-		// var gasLimit = web3.utils.toBN(6000000);
-		
-		// console.log(key);
-		// console.log(gasLimit);
-
-		// var spec1 = web3.utils.utf8ToHex("test");
-		// var params = [ "param1" , "param2" ];
-		// var title = web3.utils.utf8ToHex("TestingNodePackage");
-		// var filters= "";
-
-		// registry.listenNewProvider(filters, console.log());
-		// registry.listenNewCurve(filters, console.log());
-
-		// registry.initiateProvider({
-		// 	public_key: 123,
-		// 	title: "TestNodePackage", 
-		// 	endpoint: "endpoint1", 
-		// 	endpoint_params: params, 
-		// 	from: "0x5Df6ACc490a34f30E20c740D1a3Adf23Dc4D48A2",
-		// 	gas: 6000000
-		// })
-		// .then(result => {
-		// 	console.log(result);
-		// })
-
+		listenNewProvider();
+		listenNewCurve();
 	}
 	catch(error) {
 		console.error(error);
