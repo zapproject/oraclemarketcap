@@ -22,3 +22,11 @@ provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
 provider_title VARCHAR(50) NOT NULL,
 total_zap_value int,
 timestamp timestamp); 
+
+functionality in Handlerv2.js. run using
+node Handlerv2.js
+in open terminal to listen for events.
+
+server routing in server.js. run
+node server.js
+in open terminal and open localhost:3000 on internet browser to see database information.
