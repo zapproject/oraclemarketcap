@@ -21,7 +21,7 @@ CREATE TABLE providers(
 provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
 provider_title VARCHAR(50) NOT NULL,
 total_zap_value int NOT NULL,
-timestamp timestampNOT NULL); 
+timestamp timestamp NOT NULL); 
 
 functionality in Handlerv2.js. run using
 node Handlerv2.js
