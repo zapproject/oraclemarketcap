@@ -50,6 +50,7 @@ async function listenBoundEventsAndUpdate() {
 
 		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
 		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+		sql2_1 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
 		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
 		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 		
@@ -57,10 +58,13 @@ async function listenBoundEventsAndUpdate() {
 			if (err) throw err;
 			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
 				if (err) throw err;
-				await pool.query(sql3, [providerAddress], async function(err, total) {
-					if (err) throw err;
-					await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+				await pool.query(sql2_1, [numDots, endpointName, providerAddress], async function(err, result) {
+				if (err) throw err;
+					await pool.query(sql3, [providerAddress], async function(err, total) {
 						if (err) throw err;
+						await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+							if (err) throw err;
+						});
 					});
 				});
 			});
@@ -86,6 +90,7 @@ async function listenUnboundEventsAndUpdate() {
 
 		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
 		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+		sql2_1 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
 		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
 		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 		
@@ -93,10 +98,13 @@ async function listenUnboundEventsAndUpdate() {
 			if (err) throw err;
 			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
 				if (err) throw err;
-				await pool.query(sql3, [providerAddress], async function(err, total) {
-					if (err) throw err;
-					await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+				await pool.query(sql2_1, [numDots, endpointName, providerAddress], async function(err, result) {
+				if (err) throw err;
+					await pool.query(sql3, [providerAddress], async function(err, total) {
 						if (err) throw err;
+						await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+							if (err) throw err;
+						});
 					});
 				});
 			});
