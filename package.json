@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@zapjs/artifacts": "^1.0.4",
-    "@zapjs/bondage": "^1.0.2",
+    "@zapjs/bondage": "^1.0.3",
     "@zapjs/registry": "^1.0.3",
     "@zapjs/zaptoken": "^1.0.3",
     "babel-cli": "^6.26.0",

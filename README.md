@@ -10,9 +10,9 @@ USE oraclemarketcap
 CREATE TABLE endpoints(endpoint_id int unsigned AUTO_INCREMENT primary key,
 provider_address VARCHAR(50) NOT NULL,
 endpoint_name VARCHAR(50) NOT NULL,
-zap_value int,
-dot_value int,
-timestamp timestamp,
+zap_value int NOT NULL,
+dot_value int NOT NULL,
+timestamp timestamp NOT NULL,
 constants VARCHAR(100) NOT NULL,
 parts VARCHAR(100) NOT NULL,
 dividers VARCHAR(100) NOT NULL);
@@ -20,8 +20,8 @@ dividers VARCHAR(100) NOT NULL);
 CREATE TABLE providers(
 provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
 provider_title VARCHAR(50) NOT NULL,
-total_zap_value int,
-timestamp timestamp); 
+total_zap_value int NOT NULL,
+timestamp timestampNOT NULL); 
 
 functionality in Handlerv2.js. run using
 node Handlerv2.js
