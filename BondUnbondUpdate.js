@@ -45,17 +45,25 @@ async function listenBoundEventsAndUpdate() {
 		
 		
 		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:1 });
+		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:numDots });
 		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
 		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
 		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
+		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 		
-		await pool.query(sql1, [calcZap, endpointName, providerAddress], function(err, result) {
+		await pool.query(sql1, [calcZap, endpointName, providerAddress], async function(err, result) {
 			if (err) throw err;
-		});
-		await pool.query(sql2, [dotCost, endpointName, providerAddress], function(err, result) {
-			if (err) throw err;
+			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
+				if (err) throw err;
+				await pool.query(sql3, [providerAddress], async function(err, total) {
+					if (err) throw err;
+					await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+						if (err) throw err;
+					});
+				});
+			});
 		});
 	});
 }
@@ -73,17 +81,25 @@ async function listenUnboundEventsAndUpdate() {
 		endpointName = web3.utils.toUtf8(endpointName);
 		
 		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:1 });
+		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:numDots });
 		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
 		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
 		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
+		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 		
-		await pool.query(sql1, [calcZap, endpointName, providerAddress], function(err, result) {
+		await pool.query(sql1, [calcZap, endpointName, providerAddress], async function(err, result) {
 			if (err) throw err;
-		});
-		await pool.query(sql2, [dotCost, endpointName, providerAddress], function(err, result) {
-			if (err) throw err;
+			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
+				if (err) throw err;
+				await pool.query(sql3, [providerAddress], async function(err, total) {
+					if (err) throw err;
+					await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
+						if (err) throw err;
+					});
+				});
+			});
 		});
 	});
 }
