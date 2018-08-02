@@ -1,5 +1,6 @@
 var Web3 = require("web3");
 const util = require('util');
+const contracts = require('./ContractsData');
 
 const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
@@ -136,21 +137,34 @@ async function listenNewCurve() {
 
 }
 
+async function getPastRegistryEvents(eventName) {
+	try {
+		var logs = await contracts.zapRegistry.getPastEvents(eventName, {fromBlock:0, toBlock:'latest'});
+		return logs;
+
+	} catch (error) {
+		console.log("Get Event Error!");
+		console.error(error);
+	}
+}
+
 
 
 async function main() {
 	try {
 
 		//prove that node package works
-		registry.getProviderTitle("0x014a87cc7954dd50a566a791e4975abaa49f8745")
-		.then(title => console.log(title));
+		// registry.getProviderTitle("0x014a87cc7954dd50a566a791e4975abaa49f8745")
+		// .then(title => console.log(title));
 
 		//UNCOMMENT THIS LINE TO POPULATE PROVIDERS TABLE!!!!
-		getAllProviders();
+		// getAllProviders();
 
 		// listenNewProvider();
 		// listenNewCurve();
 
+		await getPastRegistryEvents('NewCurve').then(console.log);
+		console.log(contracts.zapRegistry.getPastEvents)
 	}
 	catch(error) {
 		console.error(error);
