@@ -151,18 +151,7 @@ app.get('/endpoints/name/:name', (req,res) => {
 			console.error(err);
 	})
 })
-app.get('/endpoints/endpoint/:id', (req,res) => {
-	var id = req.params.id;
-	console.log(id);
-	var query = "SELECT * FROM endpoints WHERE endpoint_id=?";
-	pool.query(query, id, function(err, results) {
-		if(!err) {
-			res.json({data: results});
-		}
-		else 
-			console.error(err);
-	})
-})
+
 app.get('/endpoints/zapasc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value asc";
