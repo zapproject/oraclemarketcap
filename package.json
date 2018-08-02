@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "1.0.3": "^1.0.3",
     "@zapjs/artifacts": "^1.0.4",
     "@zapjs/bondage": "^1.0.3",
     "@zapjs/registry": "^1.0.3",
