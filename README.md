@@ -1,7 +1,7 @@
-###oraclemarketcap
+### oraclemarketcap
 
 
-### How to Initialize mySQL Database 
+## How to Initialize mySQL Database 
 
 `CREATE DATABASE oraclemarketcap`
 `USE oraclemarketcap`
