@@ -38,7 +38,7 @@ async function getAllProviders() {
 		providerTitle = web3.utils.toUtf8(providerTitle);
 		var providerAddress = provider.oracleAddress;
 		var providerKey = provider.publicKey;
-		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?)";
+		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?) ON DUPLICATE KEY UPDATE provider_address = provider_address";
 		
 		pool.query(sql, [providerAddress, providerTitle],function(err, result) {
 				if (err) throw err;
@@ -136,6 +136,8 @@ async function listenNewCurve() {
 
 }
 
+
+
 async function main() {
 	try {
 
@@ -146,8 +148,9 @@ async function main() {
 		//UNCOMMENT THIS LINE TO POPULATE PROVIDERS TABLE!!!!
 		getAllProviders();
 
-		listenNewProvider();
-		listenNewCurve();
+		// listenNewProvider();
+		// listenNewCurve();
+
 	}
 	catch(error) {
 		console.error(error);
