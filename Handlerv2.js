@@ -22,6 +22,12 @@ var pool = mysql.createPool({
 	password: DB.password,
 	database: DB.dbName 
 });
+var con = mysql.createConnection({
+	host: DB.db,
+	user: DB.user,
+	password: DB.password,
+	database: DB.dbName
+});
 
 pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
         		if (error) throw error;
@@ -118,6 +124,39 @@ async function getPastRegistryEvents(eventName) {
 	}
 }
 
+async function getPastEndpoints() {
+	//clears endpoint data before
+	await con.connect(function (err) {
+		if (err) throw err;
+		console.log("Connected!");
+	});
+	var regEvents = await getPastRegistryEvents("NewCurve");
+	// console.log(regEvents.length)
+	// sql1 = "DELETE FROM endpoints";
+	// await con.query(sql1, function(err) {
+	// 	if(err) throw(err)
+	// });
+	for (let i in regEvents) {
+		provider = regEvents[i].returnValues.provider;
+		endptName = String(regEvents[i].returnValues.endpoint);
+		endptUtf = web3.utils.toUtf8(endptName);
+		constants = String(regEvents[i].returnValues.constants);
+		parts = String(regEvents[i].returnValues.parts);
+		dividers = String(regEvents[i].returnValues.dividers);
+		sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
+		await con.query(sql, [provider, endptUtf, constants, parts, dividers], function(err) {
+			if(err) throw(err)
+		});
+		console.log("Provider "+i+":");
+		console.log("\t"+provider);
+		console.log("\t"+endptUtf);
+		console.log("\t"+constants);
+		console.log("\t"+parts);
+		console.log("\t"+dividers);
+	}
+	con.end();
+}
+
 async function listenBound() {
 	bondage.listenBound({}, async function(error, result) {
 		if(error) throw(error);
@@ -203,11 +242,16 @@ async function listenUnbound() {
 
 async function main() {
 	try {
-		getAllProviders();
-		listenNewProvider();
-		listenNewCurve();
-		listenBound();
-		listenUnbound();
+		// getAllProviders();
+		getPastEndpoints();
+		// events = await getPastRegistryEvents("NewCurve");
+		// console.log(events);
+		// console.log(events.length);
+		// listenNewProvider();
+		// listenNewCurve();
+		// listenBound();
+		// listenUnbound();
+
 	}
 	catch(error) {
 		console.error(error);
