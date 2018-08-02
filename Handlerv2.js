@@ -137,9 +137,9 @@ async function listenNewCurve() {
 
 }
 
-async function getPastRegistryEvents() {
+async function getPastRegistryEvents(eventName) {
 	try {
-		var logs = await contracts.zapRegistry.getPastEvents({fromBlock:0, toBlock:'latest'});
+		var logs = await contracts.zapRegistry.getPastEvents(eventName, {fromBlock:0, toBlock:'latest'});
 		return logs;
 
 	} catch (error) {
@@ -163,7 +163,7 @@ async function main() {
 		// listenNewProvider();
 		// listenNewCurve();
 
-		await getPastRegistryEvents().then(console.log);
+		await getPastRegistryEvents('NewCurve').then(console.log);
 		console.log(contracts.zapRegistry.getPastEvents)
 	}
 	catch(error) {
