@@ -131,11 +131,6 @@ async function getPastEndpoints() {
 		console.log("Connected!");
 	});
 	var regEvents = await getPastRegistryEvents("NewCurve");
-	// console.log(regEvents.length)
-	// sql1 = "DELETE FROM endpoints";
-	// await con.query(sql1, function(err) {
-	// 	if(err) throw(err)
-	// });
 	for (let i in regEvents) {
 		provider = regEvents[i].returnValues.provider;
 		endptName = String(regEvents[i].returnValues.endpoint);
@@ -242,15 +237,12 @@ async function listenUnbound() {
 
 async function main() {
 	try {
-		// getAllProviders();
+		getAllProviders();
 		getPastEndpoints();
-		// events = await getPastRegistryEvents("NewCurve");
-		// console.log(events);
-		// console.log(events.length);
-		// listenNewProvider();
-		// listenNewCurve();
-		// listenBound();
-		// listenUnbound();
+		listenNewProvider();
+		listenNewCurve();
+		listenBound();
+		listenUnbound();
 
 	}
 	catch(error) {
