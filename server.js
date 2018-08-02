@@ -1,18 +1,24 @@
 const express = require("express");
 const util = require('util');
+const config = require("./config/config.json");
+
 var app = express();
 
-const PORT = 3000 //maybe make this an environment variable later?
+const PORT = config.port;
+const DB = config.db;
+
 
 app.use(express.static('public'));
 
 var mysql = require('mysql');
 var pool = mysql.createPool({
-	host: "localhost",
-	user: "root",
-	password: "",
-	database: "oraclemarketcap"
+	host: DB.host,
+	user: DB.user,
+	password: DB.password,
+	database: DB.dbName
 });
+
+
 pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
         		if (error) throw error;
         		console.log('Database connection successfully established; Fetching data.');
@@ -56,8 +62,6 @@ app.get('/providers/address/:address', (req,res) => {
 	})
 })
 
-
-//figure out how to differentiate between title and address GETS
 app.get('/providers/title/:title', (req,res) => {
 	var title = req.params.title;
 	console.log(title);
