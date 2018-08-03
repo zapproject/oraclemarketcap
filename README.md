@@ -24,9 +24,9 @@ zap_value int NOT NULL DEFAULT 0,
 dot_value int NOT NULL DEFAULT 0,
 dot_issued int NOT NULL DEFAULT 0, 
 timestamp timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-constants VARCHAR(100) NOT NULL,
-parts VARCHAR(100) NOT NULL,
-dividers VARCHAR(100) NOT NULL,
+constants TEXT NOT NULL,
+parts TEXT NOT NULL,
+dividers TEXT NOT NULL,
 primary key(provider_address, endpoint_name));
 
 CREATE TABLE providers(
