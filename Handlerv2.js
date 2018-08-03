@@ -22,7 +22,8 @@ var pool = mysql.createPool({
 	password: DB.password,
 	database: DB.dbName 
 });
-var con = mysql.createConnection({
+
+var con = mysql.createConnection({ 
 	host: DB.db,
 	user: DB.user,
 	password: DB.password,
@@ -158,9 +159,8 @@ async function listenBound() {
 		
 		console.log(result);
 		var log = result.returnValues;
-		console.log("Bond returnValues" + log);
 
-		providerAddress = log.holder;
+		providerAddress = log.oracle;
 		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
 		console.log("endpointName : " + endpointName);
@@ -168,7 +168,9 @@ async function listenBound() {
 		
 		
 		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:numDots });
+		console.log("numDots "+numDots)
+
+		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
 		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
@@ -192,7 +194,7 @@ async function listenBound() {
 				});
 			});
 		});
-	});
+	})
 }
 
 async function listenUnbound() {
@@ -201,13 +203,15 @@ async function listenUnbound() {
 		
 		console.log(result);
 		var log = result.returnValues;
-		console.log("Unbond returnValues" + log);
+		
 
-		providerAddress = log.holder;
+		providerAddress = log.oracle;
 		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
 		
+		
 		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
+		console.log(numDots);
 		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:numDots });
 		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
@@ -232,7 +236,7 @@ async function listenUnbound() {
 				});
 			});
 		});
-	});
+	})
 }
 
 async function main() {
@@ -243,7 +247,6 @@ async function main() {
 		listenNewCurve();
 		listenBound();
 		listenUnbound();
-
 	}
 	catch(error) {
 		console.error(error);
