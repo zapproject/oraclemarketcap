@@ -1,18 +1,24 @@
 const express = require("express");
 const util = require('util');
+const config = require("./config/config.json");
+
 var app = express();
 
-const PORT = 3000 //maybe make this an environment variable later?
+const PORT = config.port;
+const DB = config.db;
+
 
 app.use(express.static('public'));
 
 var mysql = require('mysql');
 var pool = mysql.createPool({
-	host: "localhost",
-	user: "root",
-	password: "",
-	database: "oraclemarketcap"
+	host: DB.host,
+	user: DB.user,
+	password: DB.password,
+	database: DB.dbName
 });
+
+
 pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
         		if (error) throw error;
         		console.log('Database connection successfully established; Fetching data.');
@@ -56,8 +62,6 @@ app.get('/providers/address/:address', (req,res) => {
 	})
 })
 
-
-//figure out how to differentiate between title and address GETS
 app.get('/providers/title/:title', (req,res) => {
 	var title = req.params.title;
 	console.log(title);
@@ -72,7 +76,7 @@ app.get('/providers/title/:title', (req,res) => {
 })
 app.get('/providers/asc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM providers WHERE total_zap_value IS NOT NULL ORDER BY total_zap_value asc";
+	var query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value asc";
 	pool.query(query,function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -84,7 +88,7 @@ app.get('/providers/asc', async function(req,res) {
 })
 app.get('/providers/desc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM providers WHERE total_zap_value IS NOT NULL ORDER BY total_zap_value desc";
+	var query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value desc";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -147,21 +151,10 @@ app.get('/endpoints/name/:name', (req,res) => {
 			console.error(err);
 	})
 })
-app.get('/endpoints/endpoint/:id', (req,res) => {
-	var id = req.params.id;
-	console.log(id);
-	var query = "SELECT * FROM endpoints WHERE endpoint_id=?";
-	pool.query(query, id, function(err, results) {
-		if(!err) {
-			res.json({data: results});
-		}
-		else 
-			console.error(err);
-	})
-})
+
 app.get('/endpoints/zapasc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoints WHERE zap_value IS NOT NULL ORDER BY zap_value asc";
+	var query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value asc";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -173,7 +166,7 @@ app.get('/endpoints/zapasc', async function(req,res) {
 })
 app.get('/endpoints/zapdesc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoints WHERE zap_value IS NOT NULL ORDER BY zap_value desc";
+	var query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value desc";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -185,7 +178,7 @@ app.get('/endpoints/zapdesc', async function(req,res) {
 })
 app.get('/endpoints/dotasc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoints WHERE dot_value IS NOT NULL ORDER BY dot_value asc";
+	var query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value asc";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
@@ -197,7 +190,31 @@ app.get('/endpoints/dotasc', async function(req,res) {
 })
 app.get('/endpoints/dotdesc', async function(req,res) {
 	console.log("recieved req");
-	var query = "SELECT * FROM endpoints WHERE dot_value IS NOT NULL ORDER BY dot_value desc";
+	var query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value desc";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			console.error(err);
+	})
+
+})
+app.get('/endpoints/numdotasc', async function(req,res) {
+	console.log("recieved req");
+	var query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued asc";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			console.error(err);
+	})
+
+})
+app.get('/endpoints/numdotdesc', async function(req,res) {
+	console.log("recieved req");
+	var query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued desc";
 	pool.query(query, function(err, results) {
 		if(!err) {
 			res.json({data: results});
