@@ -154,7 +154,6 @@ app.get('/endpoints/address/:address', (req,res) => {
 			res.json({data: results});
 		}
 		else 
-
 			handleError(req, res, err);
 	});
 });
