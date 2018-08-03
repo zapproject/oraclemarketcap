@@ -28,8 +28,29 @@ pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
 pool.query = util.promisify(pool.query);
 
 app.get('/', (req,res) => { 
-	res.send("index.html"); 
+	res.send("index.html");
+	res.status(200); 
 });
+
+//=========================================================//
+//	Error Handler     									   //
+//=========================================================//
+// Sample usage:
+//
+// app.get('/test_error_handler', (req, res) => {
+//	 handleError(req, res, "test_error_1");
+// })
+
+
+function handleError(req, res, err) {
+	switch(req.method) {
+		case "GET":
+			res.status(404);
+			break;
+	}
+	console.error(err);
+	res.json({'error': err});
+}
 
 //=========================================================//
 //	Providers API										   //
@@ -43,7 +64,7 @@ app.get('/providers', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
 
 });
@@ -58,7 +79,7 @@ app.get('/providers/address/:address', (req,res) => {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
 });
 
@@ -71,9 +92,10 @@ app.get('/providers/title/:title', (req,res) => {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
 });
+
 app.get('/providers/asc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value asc";
@@ -82,9 +104,8 @@ app.get('/providers/asc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/providers/desc', async function(req,res) {
 	console.log("recieved req");
@@ -94,9 +115,8 @@ app.get('/providers/desc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/providers/lastupdated', async function(req,res) {
 	console.log("recieved req");
@@ -106,9 +126,8 @@ app.get('/providers/lastupdated', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 
 //=========================================================//
@@ -122,9 +141,8 @@ app.get('/endpoints', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 
 app.get('/endpoints/address/:address', (req,res) => {
@@ -136,7 +154,8 @@ app.get('/endpoints/address/:address', (req,res) => {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+
+			handleError(req, res, err);
 	});
 });
 app.get('/endpoints/name/:name', (req,res) => {
@@ -148,7 +167,7 @@ app.get('/endpoints/name/:name', (req,res) => {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
 });
 
@@ -160,9 +179,8 @@ app.get('/endpoints/zapasc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/zapdesc', async function(req,res) {
 	console.log("recieved req");
@@ -172,9 +190,8 @@ app.get('/endpoints/zapdesc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/dotasc', async function(req,res) {
 	console.log("recieved req");
@@ -184,9 +201,8 @@ app.get('/endpoints/dotasc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/dotdesc', async function(req,res) {
 	console.log("recieved req");
@@ -196,9 +212,8 @@ app.get('/endpoints/dotdesc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/numdotasc', async function(req,res) {
 	console.log("recieved req");
@@ -208,9 +223,8 @@ app.get('/endpoints/numdotasc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/numdotdesc', async function(req,res) {
 	console.log("recieved req");
@@ -220,9 +234,8 @@ app.get('/endpoints/numdotdesc', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 app.get('/endpoints/lastupdated', async function(req,res) {
 	console.log("recieved req");
@@ -232,9 +245,8 @@ app.get('/endpoints/lastupdated', async function(req,res) {
 			res.json({data: results});
 		}
 		else 
-			console.error(err);
+			handleError(req, res, err);
 	});
-
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
