@@ -44,9 +44,9 @@ app.get('/providers', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 
 app.get('/providers/address/:address', (req,res) => {
 	var address = req.params.address;
@@ -59,8 +59,8 @@ app.get('/providers/address/:address', (req,res) => {
 		}
 		else 
 			console.error(err);
-	})
-})
+	});
+});
 
 app.get('/providers/title/:title', (req,res) => {
 	var title = req.params.title;
@@ -72,8 +72,8 @@ app.get('/providers/title/:title', (req,res) => {
 		}
 		else 
 			console.error(err);
-	})
-})
+	});
+});
 app.get('/providers/asc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value asc";
@@ -83,9 +83,9 @@ app.get('/providers/asc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/providers/desc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value desc";
@@ -95,9 +95,9 @@ app.get('/providers/desc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/providers/lastupdated', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM providers ORDER BY timestamp DESC";
@@ -107,9 +107,9 @@ app.get('/providers/lastupdated', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 
 //=========================================================//
 //	Endpoints API										   //
@@ -123,9 +123,9 @@ app.get('/endpoints', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 
 app.get('/endpoints/address/:address', (req,res) => {
 	var address = req.params.address;
@@ -137,8 +137,8 @@ app.get('/endpoints/address/:address', (req,res) => {
 		}
 		else 
 			console.error(err);
-	})
-})
+	});
+});
 app.get('/endpoints/name/:name', (req,res) => {
 	var name = req.params.name;
 	console.log(name);
@@ -149,8 +149,8 @@ app.get('/endpoints/name/:name', (req,res) => {
 		}
 		else 
 			console.error(err);
-	})
-})
+	});
+});
 
 app.get('/endpoints/zapasc', async function(req,res) {
 	console.log("recieved req");
@@ -161,9 +161,9 @@ app.get('/endpoints/zapasc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/zapdesc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value desc";
@@ -173,9 +173,9 @@ app.get('/endpoints/zapdesc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/dotasc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value asc";
@@ -185,9 +185,9 @@ app.get('/endpoints/dotasc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/dotdesc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value desc";
@@ -197,9 +197,9 @@ app.get('/endpoints/dotdesc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/numdotasc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued asc";
@@ -209,9 +209,9 @@ app.get('/endpoints/numdotasc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/numdotdesc', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued desc";
@@ -221,9 +221,9 @@ app.get('/endpoints/numdotdesc', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 app.get('/endpoints/lastupdated', async function(req,res) {
 	console.log("recieved req");
 	var query = "SELECT * FROM endpoints ORDER BY timestamp DESC";
@@ -233,8 +233,8 @@ app.get('/endpoints/lastupdated', async function(req,res) {
 		}
 		else 
 			console.error(err);
-	})
+	});
 
-})
+});
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

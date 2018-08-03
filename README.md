@@ -32,7 +32,7 @@ primary key(provider_address, endpoint_name));
 CREATE TABLE providers(
 provider_address VARCHAR(50) PRIMARY KEY UNIQUE,
 provider_title VARCHAR(50) NOT NULL,
-total_zap_value int NOT NULL DEFAULT 0,
+total_zap_value bigint NOT NULL DEFAULT 0,
 timestamp timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP); 
 ```
 
