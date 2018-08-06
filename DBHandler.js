@@ -96,10 +96,10 @@ function getProviders(){
 	var query = "SELECT * FROM providers";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -107,10 +107,10 @@ function getProvidersByAddress(address){
 	var query = "SELECT * FROM providers WHERE provider_address=?";
 	pool.query(query, address, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 	
 }
@@ -118,10 +118,10 @@ function getProvidersByTitle(title){
 	var query = "SELECT * FROM providers WHERE provider_title=?";
 	pool.query(query, title, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 	
 }
@@ -134,10 +134,10 @@ function getProvidersByZap(orderBy){
 
 	pool.query(query,function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 	
 }
@@ -145,10 +145,10 @@ function getProvidersLastUpdated(){
 	var query = "SELECT * FROM providers ORDER BY timestamp DESC";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 	
 }
@@ -159,10 +159,10 @@ function getEndpoints(){
 var query = "SELECT * FROM endpoints";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -170,10 +170,10 @@ function getEndpointsByAddress(address){
 var query = "SELECT * FROM endpoints WHERE provider_address=?";
 	pool.query(query, address, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -181,10 +181,10 @@ function getEndpointsByName(name){
 var query = "SELECT * FROM endpoints WHERE endpoint_name=?";
 	pool.query(query, name, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -196,10 +196,10 @@ function getEndpointsByZapValue(){
 	query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value desc";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -212,10 +212,10 @@ function getEndpointsByDotValue(orderBy){
 	
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -227,10 +227,10 @@ function getEndpointsByDotIssued(orderBy){
 	query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued desc";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
@@ -238,10 +238,10 @@ function getEndpointsByTimeStamp(){
 var query = "SELECT * FROM endpoints ORDER BY timestamp DESC";
 	pool.query(query, function(err, results) {
 		if(!err) {
-			res.json({data: results});
+			return results;
 		}
 		else 
-			handleError(req, res, err);
+			return err;
 	});
 
 }
