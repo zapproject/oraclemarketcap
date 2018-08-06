@@ -10,7 +10,7 @@ const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
 
 const INFURA_URL = "wss://kovan.infura.io/ws";
-
+const dbhandler =require("./DBHandler.js");
 var web3 = new Web3(new Web3.providers.WebsocketProvider(INFURA_URL));
 var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
