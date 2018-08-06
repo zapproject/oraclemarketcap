@@ -10,7 +10,7 @@ const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
 
 const INFURA_URL = "wss://kovan.infura.io/ws";
-const dbhandler =require("./DBHandler.js");
+const dbHandler =require("./DBHandler.js");
 var web3 = new Web3(new Web3.providers.WebsocketProvider(INFURA_URL));
 var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
@@ -48,12 +48,8 @@ async function getAllProviders() {
 		providerTitle = web3.utils.toUtf8(providerTitle);
 		var providerAddress = provider.oracleAddress;
 		var providerKey = provider.publicKey;
-		sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?) ON DUPLICATE KEY UPDATE provider_address = provider_address";
-		
-		pool.query(sql, [providerAddress, providerTitle],function(err, result) {
-				if (err) throw err;
-				console.log("Inserted correctly");
-		});
+		dbHandler.setProviders(providerAddress,providerTitle)
+
 		console.log("Provider " + i + ":");
 		console.log("\t"+providerAddress);
 		console.log("\t"+providerTitle);
@@ -75,15 +71,8 @@ async function listenNewProvider() {
 		var providerTitle = log.title;
 		providerTitle = web3.utils.toUtf8(providerTitle);
 		var providerAddress = log.provider;
+		dbHandler.setProviders(providerAddress,providerTitle)
 
-		var sql = "INSERT INTO providers (provider_address, provider_title) VALUES(?, ?)"
-		pool.query(sql, [providerAddress, providerTitle], function(error, result) {
-			if(!error)
-			console.log(result);
-			else {
-				throw(error);
-			}
-		})
 	})
 }
 
@@ -101,15 +90,8 @@ async function listenNewCurve() {
 		constants = String(log.constants);
 		parts = String(log.parts);
 		dividers = String(log.dividers);
+		dbHandler.setEndpoints(provider, endpointName, constants, parts, dividers)
 
-		var sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES(?,?,?,?,?)"
-		pool.query(sql, [provider, endpointName, constants, parts, dividers], function(error, result) {
-			if(!error)
-			console.log(result);
-			else {
-				throw(error);
-			}
-		})
 	})
 
 }
@@ -135,17 +117,16 @@ async function getPastEndpoints() {
 	for (let i in regEvents) {
 		provider = regEvents[i].returnValues.provider;
 		endptName = String(regEvents[i].returnValues.endpoint);
-		endptUtf = web3.utils.toUtf8(endptName);
+		endptName = web3.utils.toUtf8(endptName);
 		constants = String(regEvents[i].returnValues.constants);
 		parts = String(regEvents[i].returnValues.parts);
 		dividers = String(regEvents[i].returnValues.dividers);
-		sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
-		await con.query(sql, [provider, endptUtf, constants, parts, dividers], function(err) {
-			if(err) throw(err)
-		});
+
+		dbHandler.setEndpoints(provider, endptName, constants, parts, dividers)
+
 		console.log("Provider "+i+":");
 		console.log("\t"+provider);
-		console.log("\t"+endptUtf);
+		console.log("\t"+endptName);
 		console.log("\t"+constants);
 		console.log("\t"+parts);
 		console.log("\t"+dividers);
@@ -166,34 +147,7 @@ async function listenBound() {
 		console.log("endpointName : " + endpointName);
 		console.log("holder : " + providerAddress);
 		
-		
-		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-		console.log("numDots "+numDots)
-
-		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
-		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
-
-		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
-		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
-		sql2_1 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
-		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
-		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
-		
-		await pool.query(sql1, [calcZap, endpointName, providerAddress], async function(err, result) {
-			if (err) throw err;
-			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
-				if (err) throw err;
-				await pool.query(sql2_1, [numDots, endpointName, providerAddress], async function(err, result) {
-				if (err) throw err;
-					await pool.query(sql3, [providerAddress], async function(err, total) {
-						if (err) throw err;
-						await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
-							if (err) throw err;
-						});
-					});
-				});
-			});
-		});
+		dbHandler.setBondage(endpointName,providerAddress);
 	})
 }
 
@@ -208,34 +162,8 @@ async function listenUnbound() {
 		providerAddress = log.oracle;
 		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
-		
-		
-		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-		console.log(numDots);
-		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots:numDots });
-		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
+		dbHandler.setBondage(endpointName,providerAddress);
 
-		sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
-		sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
-		sql2_1 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
-		sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
-		sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
-		
-		await pool.query(sql1, [calcZap, endpointName, providerAddress], async function(err, result) {
-			if (err) throw err;
-			await pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
-				if (err) throw err;
-				await pool.query(sql2_1, [numDots, endpointName, providerAddress], async function(err, result) {
-				if (err) throw err;
-					await pool.query(sql3, [providerAddress], async function(err, total) {
-						if (err) throw err;
-						await pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
-							if (err) throw err;
-						});
-					});
-				});
-			});
-		});
 	})
 }
 
