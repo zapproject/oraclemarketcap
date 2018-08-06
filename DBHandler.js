@@ -17,6 +17,8 @@ var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers
 
 var mysql = require('mysql');
 
+var BN = require("BN.js");
+
 
 class DBHandler{
 
@@ -58,23 +60,18 @@ async setEndpoints(provider, endptUtf, constants, parts, dividers){
 	await this.con.query(sql, [provider, endptUtf, constants, parts, dividers])
 }
 
-async setBondage(endpointName,providerAddress){
-	var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-	// console.log("numDots "+numDots)
+async setBondage(endpointName,providerAddress, calcZap, dotCost, numDots){
 
-	var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
-	var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
-
-	let sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
-	let sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
-	let sql3 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
-	let sql4 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
-	let sql5 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
+	let sql1 = "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
+	let sql2 = "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+	let sql3 = "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
+	let sql4 = "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
+	let sql5 = "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 	
 	await this.pool.query(sql1, [calcZap, endpointName, providerAddress])
 	await this.pool.query(sql2, [dotCost, endpointName, providerAddress])
 	await this.pool.query(sql3, [numDots, endpointName, providerAddress])
-	await this.pool.query(sql4, [providerAddress])
+	var total = await this.pool.query(sql4, [providerAddress])
 	await this.pool.query(sql5, [total[0].total_zap_value, providerAddress])
 }
 

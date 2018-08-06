@@ -15,6 +15,8 @@ var web3 = new Web3(new Web3.providers.WebsocketProvider(INFURA_URL));
 var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 
+var BN = require("BN.js");
+
 var mysql = require('mysql');
 var pool = mysql.createPool({
 	host: DB.db,
@@ -146,8 +148,15 @@ async function listenBound() {
 		endpointName = web3.utils.toUtf8(endpointName);
 		console.log("endpointName : " + endpointName);
 		console.log("holder : " + providerAddress);
+
+		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
+		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
+		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: 1 });
+
+		dotCost = web3.utils.fromWei(new BN(String(dotCost)), 'ether');
+		calcZap = web3.utils.fromWei(new BN(String(calcZap)), 'ether');
 		
-		dbHandler.setBondage(endpointName,providerAddress);
+		dbHandler.setBondage(endpointName,providerAddress, calcZap, dotCost, numDots);
 	})
 }
 
@@ -158,12 +167,18 @@ async function listenUnbound() {
 		console.log(result);
 		var log = result.returnValues;
 		
-
 		providerAddress = log.oracle;
 		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
-		dbHandler.setBondage(endpointName,providerAddress);
 
+		var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
+		var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
+		var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: 1 });
+
+		dotCost = web3.utils.fromWei(new BN(String(dotCost)), 'ether');
+		calcZap = web3.utils.fromWei(new BN(String(calcZap)), 'ether');
+
+		dbHandler.setBondage(endpointName,providerAddress, calcZap, dotCost, numDots);
 	})
 }
 
