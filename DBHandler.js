@@ -47,51 +47,35 @@ constructor(){
 
 async setProviders(providerAddress, providerTitle){
 
-	sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?) ON DUPLICATE KEY UPDATE provider_address = provider_address";
-	
-	this.pool.query(sql, [providerAddress, providerTitle],function(err, result) {
-			if (err) throw err;
-			console.log("Inserted correctly");
-	});
+	let sql = "INSERT INTO providers (provider_address, provider_title) VALUES (?,?) ON DUPLICATE KEY UPDATE provider_address = provider_address";
+	await this.pool.query(sql, [providerAddress, providerTitle]);
 
 }
 
 async setEndpoints(provider, endptUtf, constants, parts, dividers){
 
-	sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
-		await this.con.query(sql, [provider, endptUtf, constants, parts, dividers], function(err) {
-			if(err) throw(err)
-		});
+	let sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
+	await this.con.query(sql, [provider, endptUtf, constants, parts, dividers])
 }
 
 async setBondage(endpointName,providerAddress){
 	var numDots = await bondage.getDotsIssued({ provider: providerAddress, endpoint: endpointName });
-	console.log("numDots "+numDots)
+	// console.log("numDots "+numDots)
 
 	var dotCost = await bondage.currentCostOfDot({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 	var calcZap = await bondage.calcZapForDots({ provider: providerAddress, endpoint: endpointName, dots: numDots });
 
-	sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
-	sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
-	sql2_1 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
-	sql3 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
-	sql4 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
+	let sql1 = await "UPDATE endpoints SET zap_value=? WHERE endpoint_name=? AND provider_address=?";				
+	let sql2 = await "UPDATE endpoints SET dot_value=? WHERE endpoint_name=? AND provider_address=?";
+	let sql3 = await "UPDATE endpoints SET dot_issued=? WHERE endpoint_name=? AND provider_address=?";
+	let sql4 = await "SELECT sum(zap_value) AS total_zap_value FROM endpoints WHERE provider_address=?";
+	let sql5 = await "UPDATE providers SET total_zap_value=? WHERE provider_address=?";
 	
-	await this.pool.query(sql1, [calcZap, endpointName, providerAddress], async function(err, result) {
-		if (err) throw err;
-		await this.pool.query(sql2, [dotCost, endpointName, providerAddress], async function(err, result) {
-			if (err) throw err;
-			await this.pool.query(sql2_1, [numDots, endpointName, providerAddress], async function(err, result) {
-			if (err) throw err;
-				await this.pool.query(sql3, [providerAddress], async function(err, total) {
-					if (err) throw err;
-					await this.pool.query(sql4, [total[0].total_zap_value, providerAddress], function(err, result) {
-						if (err) throw err;
-					});
-				});
-			});
-		});
-	});
+	await this.pool.query(sql1, [calcZap, endpointName, providerAddress])
+	await this.pool.query(sql2, [dotCost, endpointName, providerAddress])
+	await this.pool.query(sql3, [numDots, endpointName, providerAddress])
+	await this.pool.query(sql4, [providerAddress])
+	await this.pool.query(sql5, [total[0].total_zap_value, providerAddress])
 }
 
 
