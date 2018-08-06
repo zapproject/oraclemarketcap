@@ -88,3 +88,160 @@ function setBondage(endpointName,providerAddress){
 		});
 	});
 }
+
+
+// SERVER.JS
+
+function getProviders(){
+	var query = "SELECT * FROM providers";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getProvidersByAddress(address){
+	var query = "SELECT * FROM providers WHERE provider_address=?";
+	pool.query(query, address, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+	
+}
+function getProvidersByTitle(title){
+	var query = "SELECT * FROM providers WHERE provider_title=?";
+	pool.query(query, title, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+	
+}
+function getProvidersByZap(orderBy){
+	var query;
+	if(orderBy)
+	query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value asc";
+	else
+	query = "SELECT * FROM providers WHERE total_zap_value ORDER BY total_zap_value desc";
+
+	pool.query(query,function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+	
+}
+function getProvidersLastUpdated(){
+	var query = "SELECT * FROM providers ORDER BY timestamp DESC";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+	
+}
+
+// Endpoints
+
+function getEndpoints(){
+var query = "SELECT * FROM endpoints";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByAddress(address){
+var query = "SELECT * FROM endpoints WHERE provider_address=?";
+	pool.query(query, address, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByName(name){
+var query = "SELECT * FROM endpoints WHERE endpoint_name=?";
+	pool.query(query, name, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByZapValue(){
+	var query;
+	if(orderBy)
+	query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value asc";
+	else
+	query = "SELECT * FROM endpoints WHERE zap_value ORDER BY zap_value desc";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByDotValue(orderBy){
+	var query;
+	if(orderBy)
+	query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value asc";
+	else
+	query = "SELECT * FROM endpoints WHERE dot_value ORDER BY dot_value desc";
+	
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByDotIssued(orderBy){
+	var query;
+	if(orderBy) 
+	query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued asc";
+	else
+	query = "SELECT * FROM endpoints WHERE dot_issued ORDER BY dot_issued desc";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
+function getEndpointsByTimeStamp(){
+var query = "SELECT * FROM endpoints ORDER BY timestamp DESC";
+	pool.query(query, function(err, results) {
+		if(!err) {
+			res.json({data: results});
+		}
+		else 
+			handleError(req, res, err);
+	});
+
+}
