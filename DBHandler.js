@@ -127,6 +127,13 @@ var query = "SELECT * FROM endpoints WHERE endpoint_name=?";
 	let results = await this.pool.query(query, name) 
 	return results;
 }
+
+async getEndpointsByProviderTitle(title){
+var query = "select providers.provider_title, endpoints.* from providers inner join endpoints on providers.provider_address=endpoints.provider_address where providers.provider_title= ?";
+	let results = await this.pool.query(query, title) 
+	return results;
+}
+
 async getEndpointsByZapValue(){
 	var query;
 	if(orderBy)

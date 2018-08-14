@@ -146,10 +146,22 @@ app.get('/endpoints/address/:address', async (req,res) => {
 		handleError(req, res, err);
 	}
 });
+
 app.get('/endpoints/name/:name', async(req,res) => {
 	var name = req.params.name;
 	try{
 		results = await dbHandler.getEndpointsByName(name)
+		res.json({data: results});
+	}
+	catch(err){
+		handleError(req, res, err);
+	}
+});
+
+app.get('/endpoints/title/:title', async(req,res) => {
+	var title = req.params.title;
+	try{
+		results = await dbHandler.getEndpointsByProviderTitle(title)
 		res.json({data: results});
 	}
 	catch(err){
