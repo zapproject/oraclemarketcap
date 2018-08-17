@@ -1,3 +1,10 @@
+/* Main Elements ------------------------------- */
+/* Logo ------------------------------- */
+/* Font Awesome */
+/* Search Bar */
+/* Table */
+
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -20,39 +27,13 @@ time, mark, audio, video {
 
 
 body {
-/*	background: radial-gradient(ellipse farthest-corner at center top, #61CFFF, #0078FE) no-repeat;*/
+  background: radial-gradient(ellipse farthest-corner at center top, #61CFFF, #0078FE) no-repeat;
   font-family: Arial;
 }
 
 header {
   height: 80px;
   padding: 30px 30px 0;
-}
-
-.header-design {
-  width: 100%;
-  padding-top: 45%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse farthest-corner at center top, #61CFFF, #0078FE) no-repeat;
-  overflow: hidden; 
-}
-
-.header-design:after {
-  content: "";
-  display: block;
-  background: white;
-  height: 400px;
-  width: 8000px;
-  position: absolute;
-  z-index: 1;
-  bottom: -50%;
-  left: 50%;
-  margin-left: -4000px;
-  -webkit-transform: rotate(-6deg);
-          transform: rotate(-6deg); 
 }
 
 h1 {
@@ -85,9 +66,9 @@ a {
 	vertical-align: middle;
 }
 
-footer {
-	height: 80px;
+footer {	
 	background-color: #444;
+	height: 80px;
 }
 
 /* Index --------------------------------------------------------------------------- */
@@ -297,3 +278,4 @@ img {
 	height: 500px;
 	width: 300px;
 }
+
