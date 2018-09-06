@@ -58,7 +58,35 @@ async function loadProvider(owner) {
     };
     return new ZapProvider(owner, Object.assign(contracts, { handler }));
 }
-async function getAllProviders() {
+function curveString(curve) {
+    if (curve.length == 0) {
+        return "Empty curve";
+    }
+    let output = "";
+    let start = 1;
+    let index = 0;
+    while (index < curve.length) {
+        // 3 0 0 0 2 1000
+        const length = +curve[index];
+        const base = index + 1;
+        const poly = curve.slice(base, base + length);
+        const end = +curve[base + length];
+        output += poly.map((x, i) => {
+            if (x == 0) {
+                return '';
+            }
+            switch (i) {
+                case 0: return `${x}`;
+                case 1: return `${x > 1 ? x : ''}x`;
+                default: return `${x > 1 ? x : ''}x^${i}`;
+            }
+        }).filter(x => x.length > 0).join(" + ") + ` on (${start} to ${end}]\n`;
+        index = base + length + 1;
+        start = end;
+    }
+    return output;
+}
+async function populateDatabase() {
 	var addresses = await registry.getAllProviders();
 	console.log(addresses);
 	if (addresses.length == 0) {
@@ -67,33 +95,16 @@ async function getAllProviders() {
     }
     const providers = await Promise.all(addresses.map(address => loadProvider(address)));
    for (const provider of providers) {
-   	console.log(`Provider :${await provider.getTitle()}`)
+   		const title = await provider.getTitle();
         const endpoints = await provider.getEndpoints();
+        const address=provider.providerOwner;
+    	dbHandler.setProviders(address,title)
+
         for (const endpoint of endpoints) {
-            console.log(`Provider ${await provider.getTitle()} / Endpoint ${endpoint}`);
-            console.log(`Address: ${provider.providerOwner}`);
-            // console.log(`Curve\n${curve_1.curveString((await provider.getCurve(endpoint)).values)}\n`);
+			const curve = String((await provider.getCurve(endpoint)).values);
+			dbHandler.setEndpoints(address,title,curve);
         }
     }
-    // console.log(providers);
-	// var i = 0;
-	// do {
-	// 	var providers =  await registry.getAllProviders();
-
-	// 	var providerTitle = provider.title;
-	// 	providerTitle = web3.utils.toUtf8(providerTitle);
-	// 	var providerAddress = provider.oracleAddress;
-	// 	var providerKey = provider.publicKey;
-	// 	dbHandler.setProviders(providerAddress,providerTitle)
-
-	// 	console.log("Provider " + i + ":");
-	// 	console.log("\t"+providerAddress);
-	// 	console.log("\t"+providerTitle);
-	// 	console.log("\t"+providerKey);
-
-	// 	i = parseInt(provider.nextIndex);
-
-	// } while(i != 0);
 }
 
 async function listenNewProvider() {
@@ -123,52 +134,14 @@ async function listenNewCurve() {
 		provider = log.provider;
 		endpointName = String(log.endpoint);
 		endpointName = web3.utils.toUtf8(endpointName);
-		constants = String(log.constants);
-		parts = String(log.parts);
-		dividers = String(log.dividers);
-		dbHandler.setEndpoints(provider, endpointName, constants, parts, dividers)
+		curve = String(log.constants);
+		dbHandler.setEndpoints(provider, endpointName, curve)
 
 	})
 
 }
 
-// async function getPastRegistryEvents(eventName) {
-// 	try {
-// 		var logs = await contracts.zapRegistry.getPastEvents(eventName, {fromBlock:0, toBlock:'latest'});
-// 		return logs;
 
-// 	} catch (error) {
-// 		console.log("Get Event Error!");
-// 		console.error(error);
-// 	}
-// }
-
-async function getPastEndpoints() {
-	//clears endpoint data before
-	await con.connect(function (err) {
-		if (err) throw err;
-		console.log("Connected!");
-	});
-	var regEvents = await getPastRegistryEvents("NewCurve");
-	for (let i in regEvents) {
-		provider = regEvents[i].returnValues.provider;
-		endptName = String(regEvents[i].returnValues.endpoint);
-		endptName = web3.utils.toUtf8(endptName);
-		constants = String(regEvents[i].returnValues.constants);
-		parts = String(regEvents[i].returnValues.parts);
-		dividers = String(regEvents[i].returnValues.dividers);
-
-		dbHandler.setEndpoints(provider, endptName, constants, parts, dividers)
-
-		console.log("Provider "+i+":");
-		console.log("\t"+provider);
-		console.log("\t"+endptName);
-		console.log("\t"+constants);
-		console.log("\t"+parts);
-		console.log("\t"+dividers);
-	}
-	con.end();
-}
 
 async function listenBound() {
 	bondage.listenBound({}, async function(error, result) {
@@ -218,12 +191,12 @@ async function listenUnbound() {
 
 async function main() {
 	try {
-		getAllProviders();
-		// getPastEndpoints();
-		// listenNewProvider();
-		// listenNewCurve();
-		// listenBound();
-		// listenUnbound();
+		populateDatabase();
+		
+		listenNewProvider();
+		listenNewCurve();
+		listenBound();
+		listenUnbound();
 	}
 	catch(error) {
 		console.error(error);

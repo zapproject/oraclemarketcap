@@ -54,10 +54,10 @@ async setProviders(providerAddress, providerTitle){
 
 }
 
-async setEndpoints(provider, endptUtf, constants, parts, dividers){
+async setEndpoints(provider, endptUtf, curve){
 
-	let sql = "INSERT INTO endpoints (provider_address, endpoint_name, constants, parts, dividers) VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
-	await this.con.query(sql, [provider, endptUtf, constants, parts, dividers])
+	let sql = "INSERT INTO endpoints (provider_address, endpoint_name, curve) VALUES (?,?,?) ON DUPLICATE KEY UPDATE endpoint_name = endpoint_name";
+	await this.con.query(sql, [provider, endptUtf, curve])
 }
 
 async setBondage(endpointName,providerAddress, calcZap, dotCost, numDots){
