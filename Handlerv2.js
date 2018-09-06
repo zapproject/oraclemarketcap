@@ -1,21 +1,21 @@
 var Web3 = require("web3");
 const util = require('util');
 
-const contracts = require('./ContractsData');
+// const contracts = require('./ContractsData');
 const config = require("./config/config.json");
 
 const DB = config.db;
 
 const {ZapRegistry} = require('@zapjs/registry');
 const {ZapBondage} = require('@zapjs/bondage');
-
+const {ZapProvider} = require('@zapjs/provider');
 const INFURA_URL = "wss://kovan.infura.io/ws";
 const dbHandler =require("./DBHandler.js");
 var web3 = new Web3(new Web3.providers.WebsocketProvider(INFURA_URL));
 var registry = new ZapRegistry({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
 var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL)});
+const path_1 = require("path");
 
-var BN = require("BN.js");
 
 var mysql = require('mysql');
 var pool = mysql.createPool({
@@ -40,26 +40,60 @@ pool.query('SELECT 1 + 1 AS solution', (error, results, fields) => {
 // shorthand for getConnection, query, releaseConnection
 pool.query = util.promisify(pool.query);
 
-
+async function loadProvider(owner) {
+    const contracts = {
+        networkId: 42,
+        networkProvider: new Web3.providers.WebsocketProvider(INFURA_URL),
+    };
+    const handler = {
+        handleIncoming: (data) => {
+            console.log('handleIncoming', data);
+        },
+        handleUnsubscription: (data) => {
+            console.log('handleUnsubscription', data);
+        },
+        handleSubscription: (data) => {
+            console.log('handleSubscription', data);
+        },
+    };
+    return new ZapProvider(owner, Object.assign(contracts, { handler }));
+}
 async function getAllProviders() {
-	var i = 0;
-	do {
-		var provider =  await registry.getNextProvider(i);
+	var addresses = await registry.getAllProviders();
+	console.log(addresses);
+	if (addresses.length == 0) {
+        console.log(`Didn't find any providers`);
+        return;
+    }
+    const providers = await Promise.all(addresses.map(address => loadProvider(address)));
+   for (const provider of providers) {
+   	console.log(`Provider :${await provider.getTitle()}`)
+        const endpoints = await provider.getEndpoints();
+        for (const endpoint of endpoints) {
+            console.log(`Provider ${await provider.getTitle()} / Endpoint ${endpoint}`);
+            console.log(`Address: ${provider.providerOwner}`);
+            // console.log(`Curve\n${curve_1.curveString((await provider.getCurve(endpoint)).values)}\n`);
+        }
+    }
+    // console.log(providers);
+	// var i = 0;
+	// do {
+	// 	var providers =  await registry.getAllProviders();
 
-		var providerTitle = provider.title;
-		providerTitle = web3.utils.toUtf8(providerTitle);
-		var providerAddress = provider.oracleAddress;
-		var providerKey = provider.publicKey;
-		dbHandler.setProviders(providerAddress,providerTitle)
+	// 	var providerTitle = provider.title;
+	// 	providerTitle = web3.utils.toUtf8(providerTitle);
+	// 	var providerAddress = provider.oracleAddress;
+	// 	var providerKey = provider.publicKey;
+	// 	dbHandler.setProviders(providerAddress,providerTitle)
 
-		console.log("Provider " + i + ":");
-		console.log("\t"+providerAddress);
-		console.log("\t"+providerTitle);
-		console.log("\t"+providerKey);
+	// 	console.log("Provider " + i + ":");
+	// 	console.log("\t"+providerAddress);
+	// 	console.log("\t"+providerTitle);
+	// 	console.log("\t"+providerKey);
 
-		i = parseInt(provider.nextIndex);
+	// 	i = parseInt(provider.nextIndex);
 
-	} while(i != 0);
+	// } while(i != 0);
 }
 
 async function listenNewProvider() {
@@ -98,16 +132,16 @@ async function listenNewCurve() {
 
 }
 
-async function getPastRegistryEvents(eventName) {
-	try {
-		var logs = await contracts.zapRegistry.getPastEvents(eventName, {fromBlock:0, toBlock:'latest'});
-		return logs;
+// async function getPastRegistryEvents(eventName) {
+// 	try {
+// 		var logs = await contracts.zapRegistry.getPastEvents(eventName, {fromBlock:0, toBlock:'latest'});
+// 		return logs;
 
-	} catch (error) {
-		console.log("Get Event Error!");
-		console.error(error);
-	}
-}
+// 	} catch (error) {
+// 		console.log("Get Event Error!");
+// 		console.error(error);
+// 	}
+// }
 
 async function getPastEndpoints() {
 	//clears endpoint data before
@@ -185,11 +219,11 @@ async function listenUnbound() {
 async function main() {
 	try {
 		getAllProviders();
-		getPastEndpoints();
-		listenNewProvider();
-		listenNewCurve();
-		listenBound();
-		listenUnbound();
+		// getPastEndpoints();
+		// listenNewProvider();
+		// listenNewCurve();
+		// listenBound();
+		// listenUnbound();
 	}
 	catch(error) {
 		console.error(error);

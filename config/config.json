@@ -2,7 +2,7 @@
 	"db":{
         "host":"localhost",
         "user": "root",
-        "password":"",
+        "password":"password",
         "dbName":"oraclemarketcap",
         "recordChunk":2
     },

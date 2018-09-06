@@ -17,7 +17,7 @@ var bondage = new ZapBondage({networkId: 42, networkProvider: new Web3.providers
 
 var mysql = require('mysql');
 
-var BN = require("BN.js");
+
 
 
 class DBHandler{
