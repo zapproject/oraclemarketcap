@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Oracle Market Cap</title>
+
+	<link rel="stylesheet" href="./assets/styles/styles.css">
+	<link rel="stylesheet" href="./assets/styles/main.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+
+<body>
+
+	<header>	
+		<div class="header-design"></div>
+		<h1 id="title"><span style="font-weight: 700;">Oracle</span>Market Cap</h1>
+<!--     <nav>
+			<a href="dashboard.html" class="nav-link">Dashboard</a>
+			<a href="index.html" class="nav-link">Logout</a>
+		</nav> -->
+	</header>
+	
+
+	<!-- Search Bar -->
+	<div class="search-container">
+		<div class="search">
+			<input type="text" class="search-term" placeholder="Search by address or title">
+			<button type="submit" class="search-button">
+				<i class="fa fa-search"></i>
+			</button>
+		</div>
+	</div>
+
+	
+	<section class="table-container">
+
+		<!-- List of Providers/Endpoints -->
+		<!-- Oracle Title | Endpoint | Oracle Cap | Zap per Dot | Volume(24Hr) | Circulating Supply | Bonding Curve[Chart] | Change(24Hr)[Chart] -->
+		<table class="provider-table">
+			<colgroup>
+				<col id="title-col">
+				<col id="address-col">
+				<col id="endpoint-col">
+				<col id="boundZap-col">
+				<col id="boundDots-col">
+				<col id="price-col">
+				<col id="curve-col">
+				<col id="change-col">
+			</colgroup>
+			<tr id="provider-labels">
+				<th class="table-title">
+					Oracle Title
+					<a href="#">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Oracle Address
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Endpoint
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Total Zap Bound
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Total DOTs Bound
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Price of DOT
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Bonding Curve
+					<a href="">
+						<i class="fa fa-sort"></i>
+					</a>
+				</th>
+				<th class="table-title">
+					Change(7D)
+				</th>
+			</tr>
+		</table>
+
+		<button id="load-more">Load More</button>
+	</section>
+	
+	<footer>
+
+	</footer>
+
+<!-- 
+	<div id='providers'> 
+		<h1 style='text-align:center'> Providers</h1>
+	</div>
+	
+	<div id='endpoints'> 
+		<h1 style='text-align:center'>Endpoints</h1>
+	</div> -->
+
+	<script
+	src="https://code.jquery.com/jquery-3.3.1.min.js"
+	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+	crossorigin="anonymous"></script>
+	<script src="./js/web3.min.js"></script>
+	<script src="./js/main.js"></script>
+	<script src="./js/zapjs.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+#title-col{
+	width: 15%;
+}
+#address-col {
+	width: 25%;
+}
+#endpoint-col {
+	width: 8%;
+}
+#boundZap-col {
+	width: 5%;
+}
+#boundDots-col {
+	width: 5%;
+}
+#price-col {
+	width: 5%;
+}
+#curve-col {
+	width: 10%;
+}
+#change-col {
+	width: 10%;
+}
