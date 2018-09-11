@@ -13,87 +13,55 @@
 <body>
 
 	<header>	
-		<div class="header-design"></div>
-		<h1 id="title"><span style="font-weight: 700;">Oracle</span>Market Cap</h1>
-<!--     <nav>
-			<a href="dashboard.html" class="nav-link">Dashboard</a>
-			<a href="index.html" class="nav-link">Logout</a>
-		</nav> -->
+		<div id="logo">
+			<img src="./assets/img/omc-header-logo.png" alt="Oracle Market Cap Logo" id="omc-header-logo">
+		</div>
 	</header>
 	
-
-	<!-- Search Bar -->
-<div class="search-container">
-	<div class="search">
-		<input type="text" class="search-term" placeholder="Search by address or title">
-		<button type="submit" class="search-button">
-			<i class="fa fa-search"></i>
-		</button>
-	</div>
-</div>
-
-	
-<section class="table-container">
+<main id="table-container">
 
 	<!-- List of Providers/Endpoints -->
 	<!-- Oracle Title | Endpoint | Oracle Cap | Zap per Dot | Volume(24Hr) | Circulating Supply | Bonding Curve[Chart] | Change(24Hr)[Chart] -->
 	<table class="provider-table">
 		<tr id="provider-labels">
 			<td class="table-title">
-				Oracle Title
-				<a href="#">
-					<i class="fa fa-sort"></i>
-				</a>
+				Oracle Provider
 			</td>
 			<td class="table-title">
 				Oracle Endpoint
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
 			<td class="table-title">
 				Oracle Cap
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
 			<td class="table-title">
 				Zap per Dot
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
 			<td class="table-title">
 				Volume(24hr)
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
 			<td class="table-title">
 				Circulating Supply
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
-			<td class="table-title">
+			<td class="table-title" style="width: 125px;">
 				Bonding Curve
-				<a href="">
-					<i class="fa fa-sort"></i>
-				</a>
 			</td>
-			<td class="table-title">
+			<td class="table-title" style="width: 125px;">
 				Change(7D)
 			</td>
 		</tr>
 		<tr class="provider-listing">
-			<td>[Title]</td>
-			<td>[Endpoint]</td>
+			<td id="providers">[Providers]</td>
+			<td id="endpoints">[Endpoint]</td>
 			<td>[Oracle Cap]</td>
 			<td>[Zap/Dot]</td>
-			<td>[24hr Vol]</td>
+			<td>[24hr Volume]</td>
 			<td>[Circulating Supply]</td>
-			<td>[BC-Chart]</td>
-			<td>[7D-Chart]</td>
+			<td class="chart">
+				<canvas id="bonding-curve" height="50" width="125"></canvas>
+			</td>
+			<td class="chart">
+				<canvas id="chart-7days" height="50" width="125"></canvas>
+			</td>
 		</tr>
 		<tr class="provider-listing">
 			<td>[Title]</td>
@@ -195,27 +163,36 @@
 			<td>[BC-Chart]</td>
 			<td>[7D-Chart]</td>
 		</tr>
-
-
 	</table>
 
 	<button id="load-more">Load More</button>
-</section>
+</main>
 	
 <footer>
+	<div id="powered-by-zap">
+		<h1>Powered by Zap logo goes here</h1>
+	</div>
+	<ul class="social-links">
+		<li class="animated" data-animate="fadeInUp" data-delay=".1">
+			<a href="https://www.facebook.com/officialzapstore/" target='_blank'>
+				<em class="fa fa-facebook"></em>
+			</a>
+		</li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".2"><a href="https://twitter.com/zaporacles" target='_blank'><em class="fa fa-twitter"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".3"><a href="https://www.youtube.com/channel/UCj53uS32K8UwQCytBwPqmtg" target='_blank'><em class="fa fa-youtube-play"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".4"><a href="https://github.com/zapproject/" target='_blank'><em class="fa fa-github"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".5"><a href="https://reddit.com/r/ZapStore" target='_blank'><em class="fa fa-reddit"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".6"><a href="https://t.me/ZapOracles" target='_blank'><em class="fa fa-telegram"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".7"><a href="https://www.linkedin.com/company/zap-store/" target='_blank'><em class="fa fa-linkedin"></em></a></li>
+		<li class="animated" data-animate="fadeInUp" data-delay=".8"><a href="https://www.instagram.com/zap_org/" target='_blank'><em class="fa fa-instagram"></em></a></li>
+	</ul>
 	
 </footer>
 
-<!-- 
-	<div id='providers'> 
-		<h1 style='text-align:center'> Providers</h1>
-	</div>
-	
-	<div id='endpoints'> 
-		<h1 style='text-align:center'>Endpoints</h1>
-	</div> -->
-
 <script src="./js/scripts.js"></script>
+<script src="./js/Chart.bundle.min.js"></script>
+<script src="./js/curve-chart.js"></script>
+
 
 </body>
 </html>
