@@ -14,24 +14,21 @@
 <body>
 
 	<header>	
-		<div class="header-design"></div>
-		<h1 id="title"><span style="font-weight: 700;">Oracle</span>Market Cap</h1>
-<!--     <nav>
-			<a href="dashboard.html" class="nav-link">Dashboard</a>
-			<a href="index.html" class="nav-link">Logout</a>
-		</nav> -->
+		<div id="logo">
+			<img src="./assets/img/omc-header-logo.png" alt="Oracle Market Cap Logo" id="omc-header-logo">
+		</div>
 	</header>
 	
 
 	<!-- Search Bar -->
-	<div class="search-container">
+	<!-- <div class="search-container">
 		<div class="search">
 			<input type="text" class="search-term" placeholder="Search by address or title">
 			<button type="submit" class="search-button">
 				<i class="fa fa-search"></i>
 			</button>
 		</div>
-	</div>
+	</div> -->
 
 	
 	<section class="table-container">
@@ -41,79 +38,76 @@
 		<table class="provider-table">
 			<colgroup>
 				<col id="title-col">
-				<col id="address-col">
 				<col id="endpoint-col">
 				<col id="boundZap-col">
 				<col id="boundDots-col">
 				<col id="price-col">
 				<col id="curve-col">
-				<col id="change-col">
+				<col id="address-col">
 			</colgroup>
 			<tr id="provider-labels">
 				<th class="table-title">
 					Oracle Title
-					<a href="#">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
-				<th class="table-title">
-					Oracle Address
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
-				</th>
+				
 				<th class="table-title">
 					Endpoint
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
 				<th class="table-title">
 					Total Zap Bound
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
 				<th class="table-title">
 					Total DOTs Bound
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
 				<th class="table-title">
 					Price of DOT
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
 				<th class="table-title">
 					Bonding Curve
-					<a href="">
-						<i class="fa fa-sort"></i>
-					</a>
 				</th>
 				<th class="table-title">
-					Change(7D)
+					Oracle Address
 				</th>
+				<!-- <th class="table-title">
+					Change(7D)
+				</th> -->
 			</tr>
 		</table>
 
-		<button id="load-more">Load More</button>
+		<!-- <button id="load-more">Load More</button> -->
 	</section>
 	
-	<footer>
-
-	</footer>
-
-<!-- 
-	<div id='providers'> 
-		<h1 style='text-align:center'> Providers</h1>
-	</div>
 	
-	<div id='endpoints'> 
-		<h1 style='text-align:center'>Endpoints</h1>
-	</div> -->
-
+	<footer>
+		<div id="powered-by-zap">
+			<h1>Powered by: </h1>
+			<img src='assets/img/logo-light.png' />
+		</div>
+		<div class='legal'>
+			<ul class="social-links">
+				<li class="animated" data-animate="fadeInUp" data-delay=".1">
+					<a href="https://www.facebook.com/officialzapstore/" target='_blank'>
+						<em class="fa fa-facebook"></em>
+					</a>
+				</li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".2"><a href="https://twitter.com/zaporacles" target='_blank'><em class="fa fa-twitter"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".3"><a href="https://www.youtube.com/channel/UCj53uS32K8UwQCytBwPqmtg" target='_blank'><em class="fa fa-youtube-play"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".4"><a href="https://github.com/zapproject/" target='_blank'><em class="fa fa-github"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".5"><a href="https://reddit.com/r/ZapStore" target='_blank'><em class="fa fa-reddit"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".6"><a href="https://t.me/ZapOracles" target='_blank'><em class="fa fa-telegram"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".7"><a href="https://www.linkedin.com/company/zap-store/" target='_blank'><em class="fa fa-linkedin"></em></a></li>
+				<li class="animated" data-animate="fadeInUp" data-delay=".8"><a href="https://www.instagram.com/zap_org/" target='_blank'><em class="fa fa-instagram"></em></a></li>
+			</ul>
+			<p>
+				<a href='https://zap.org/privacy.pdf' target="_blank">Privacy</a> |
+				<a href='https://zap.org/legal.pdf'>Legal</a> |
+				Copyright © 2018, OracleMarketCap, Zap
+			</p>
+		</div>
+	</footer>
+	<script src="./js/scripts.js"></script>
+	<script src="./js/Chart.bundle.min.js"></script>
+	<script src="./js/curve-chart.js"></script>
 	<script
 	src="https://code.jquery.com/jquery-3.3.1.min.js"
 	integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="

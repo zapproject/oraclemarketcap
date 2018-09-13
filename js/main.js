@@ -99,13 +99,13 @@ function createRow(provider, endpoint){
 
 	let out = '<tr class="provider-listing">';
 	out += `<td>${oracle.title}</td>`;
-	out += `<td>${oracle.address}</td>`;
 	out += `<td>${endpoint}</td>`;
 	out += `<td>${obj.boundZap}</td>`;
 	out += `<td>${obj.boundDots}</td>`;
 	out += `<td>${obj.price}</td>`;
 	out += `<td>${curveToString(obj.curve)}</td>`;
-	out += `<td>${"CHANGE"}</td>`;
+	//out += `<td>${"CHANGE"}</td>`;
+	out += `<td class='oracleAddress'>${oracle.address}</td>`;
 	out += "</tr>";
 
 	$('.provider-table tr:last').after(out);

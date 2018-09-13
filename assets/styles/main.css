@@ -1,24 +1,29 @@
 #title-col{
-	width: 15%;
+	width: 10%;
 }
 #address-col {
-	width: 25%;
+	width: 15%;
+	max-width: 70px;
 }
 #endpoint-col {
 	width: 8%;
 }
 #boundZap-col {
-	width: 5%;
+	width: 10%;
 }
 #boundDots-col {
-	width: 5%;
+	width: 10%;
 }
 #price-col {
-	width: 5%;
+	width: 10%;
 }
 #curve-col {
 	width: 10%;
 }
-#change-col {
+/*#change-col {
 	width: 10%;
+}*/
+.oracleAddress {
+	max-width: 70px;
+	word-wrap: break-word;
 }

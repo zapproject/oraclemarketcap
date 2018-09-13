@@ -133,12 +133,9 @@ canvas {
 
 /* Footer Links */
 #powered-by-zap	{
+	border: 1px solid red;
 	height: 100px;
 	width: 310px;
-	padding: 10px;
-	margin-left: 10px;
-	display: block;
-	float: left;
 }
 
 .social-links {
@@ -146,9 +143,6 @@ canvas {
 	height: fit-content;
 	width: fit-content;
 	list-style-type: none;
-	position: relative;
-	float: right;
-	width: 350px;
 }
 
 .social-links li a {
@@ -162,35 +156,4 @@ canvas {
     border-radius: 50%;
     line-height: 30px;
     text-align: center;
-}
-#powered-by-zap img {
-	margin-top: 10px;
-	display: inline-block;
-
-}
-
-#powered-by-zap h1 {
-	display: inline-block;
-	top: -15px;
-    position: relative;
-    color: #fff;
-    margin-right: 10px;
-}
-
-.legal {
-	margin: 10px;
-	position: relative;
-	float: right;
-	display: block;
-	font-size: 12px;
-	font-family: arial, san-serif;
-	color: #fff;
-	width: 350px;
-}
-
-.legal a {
-	color: #fff;
-}
-.legal a:hover,  {
-	text-decoration: underline;
 }
