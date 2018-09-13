@@ -136,9 +136,10 @@ canvas {
 	height: 100px;
 	width: 310px;
 	padding: 10px;
-	margin-left: 10px;
+	margin-left: 20px;
 	display: block;
 	float: left;
+	margin-top: 40px;
 }
 
 .social-links {
@@ -178,7 +179,7 @@ canvas {
 }
 
 .legal {
-	margin: 10px;
+	margin-top: 40px;
 	position: relative;
 	float: right;
 	display: block;
@@ -186,6 +187,7 @@ canvas {
 	font-family: arial, san-serif;
 	color: #fff;
 	width: 350px;
+
 }
 
 .legal a {
