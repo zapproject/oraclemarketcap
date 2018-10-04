@@ -1,115 +1,100 @@
-$( document ).ready(function() {
-	init();
-});
-
-
-async function init(){
-	console.log("Init");
-	if (typeof web3 !== 'undefined'){
-		initWeb3();
-	} else {
+function init(){
+	if (typeof window.web3 === 'undefined'){
 		alert("PLEASE GET METAMASK");
 		return;
 	}
-
 	// create the registry object
-	options = {
+	const options = {
 		networkId: 42,
 		networkProvider: web3.currentProvider
 	};
-	window.registry = new zapjs.ZapRegistry(options);
-	window.bondage = new zapjs.ZapBondage(options);
-
-	await loadOracles();
-	render();
+	render(new zapjs.ZapRegistry(options), new zapjs.ZapBondage(options), document.getElementById('provider-labels').parentElement);
 }
 
-//Initializer for Web3. Also calls the initializer for the smart contract.
-function initWeb3() {
-    // Is there is an injected web3 instance?
-    if (typeof web3 !== 'undefined') {
-    	web3Provider = web3.currentProvider;
-    } else {
-        // If no injected web3 instance is detected, CAN'T register
-        alert("PLEASE INSTALL METAMASK");
-    }
-    web3 = new Web3(web3Provider);
+function getAllProvidersWithEndpointsAndTitles(registry) {
+	return registry.getAllProviders().then(providers => Promise.all([
+		Promise.all(providers.map(provider => registry.getProviderTitle(provider))),
+		Promise.all(providers.map(provider => registry.getProviderEndpoints(provider).then(endpoints => ({provider, endpoints})))),
+	]))
+	.then(([providerTitles, endpointsByProvider]) =>
+		endpointsByProvider.reduce((allEndpoints, {provider, endpoints}, providerIndex) =>
+			allEndpoints.concat(endpoints.map(endpoint => ({
+				endpoint: endpoint,
+				provider: provider,
+				title: providerTitles[providerIndex],
+			}))), [])
+	).catch(console.error);
 }
 
-
-// loads all the oracle data from contracts
-async function loadOracles(){
-	window.data = {};
-	let oracles = await window.registry.getAllProviders();
-
-	for(var i=0; i<oracles.length; i++){
-		let addr = oracles[i];
-		let endpoints = await window.registry.getProviderEndpoints(addr);
-		if(endpoints.length == 0) continue;
-		let title = await window.registry.getProviderTitle(addr);
-
-		let obj = {
-			address: addr,
-			title: title,
-			endpoints: {}
-		};
-		// TODO: get provider params
-
-		// get data for each endpoint
-		for(var j=0; j<endpoints.length; j++){ 
-			let spec = endpoints[j];
-			let key = addr + "_" + spec;
-			let curve = await window.registry.getProviderCurve(addr, spec);
-			//let endpointParams = await window.registry.getEndpointParams(addr, spec);
-			let boundDots = await window.bondage.getDotsIssued({provider: addr, endpoint: spec});
-			let boundZap = await window.bondage.getZapBound({provider: addr, endpoint: spec});
-			let nextPrice = await window.bondage.calcZapForDots({provider: addr, endpoint: spec, dots: 1});
-			
-			let endpointObj = { // TODO: add endpoint params
-				endpoint: spec,
-				curve: curve,
-				boundDots: boundDots,
-				boundZap: boundZap,
-				price: nextPrice
-			};
-			obj.endpoints[spec] = endpointObj;
-		}
-		window.data[addr] = obj;
-	}
+function render(registry, bondage, container) {
+	getAllProvidersWithEndpointsAndTitles(registry).then(oracles => {
+		oracles.forEach(oracle => {
+			container.appendChild(renderOracle(oracle, registry, bondage));
+		});
+	}).catch(console.error);
 }
 
-
-// renders the display
-function render(){
-	console.log("Rendering");
-	for (var provider in window.data) {
-		if (!window.data.hasOwnProperty(provider)) continue;
-		let oracle = window.data[provider];
-		for (var endpoint in oracle["endpoints"]) {
-			if (!oracle["endpoints"].hasOwnProperty(endpoint)) continue;
-			createRow(provider, endpoint);
-		}
-	}
+function renderOracle(oracle, registry, bondage) {
+	const tr = document.createElement('tr');
+	tr.className = 'provider-listing';
+	tr.appendChild(renderTitle(oracle));
+	tr.appendChild(renderEndpoint(oracle));
+	tr.appendChild(renderZap(oracle, bondage));
+	tr.appendChild(renderDots(oracle, bondage));
+	tr.appendChild(renderPrice(oracle, bondage));
+	tr.appendChild(renderCurve(oracle, registry));
+	tr.appendChild(renderAddress(oracle));
+	return tr;
 }
 
-function createRow(provider, endpoint){
-	console.log("ROW:", provider, endpoint);
-	let oracle = window.data[provider];
-	let obj = oracle["endpoints"][endpoint];
-
-	let out = '<tr class="provider-listing">';
-	out += `<td>${oracle.title}</td>`;
-	out += `<td>${endpoint}</td>`;
-	out += `<td>${obj.boundZap}</td>`;
-	out += `<td>${obj.boundDots}</td>`;
-	out += `<td>${obj.price}</td>`;
-	out += `<td>${curveToString(obj.curve)}</td>`;
-	//out += `<td>${"CHANGE"}</td>`;
-	out += `<td class='oracleAddress'>${oracle.address}</td>`;
-	out += "</tr>";
-
-	$('.provider-table tr:last').after(out);
+function renderTitle(oracle) {
+	const td = document.createElement('td');
+	td.textContent = oracle.title;
+	return td;
 }
+
+function renderEndpoint(oracle) {
+	const td = document.createElement('td');
+	td.textContent = oracle.endpoint;
+	return td;
+}
+
+function renderZap(oracle, bondage) {
+	const td = document.createElement('td');
+	bondage.getZapBound(oracle).then(zap => { td.textContent = zap; });;
+	return td;
+}
+
+function renderDots(oracle, bondage) {
+	const td = document.createElement('td');
+	bondage.getDotsIssued(oracle).then(dots => { td.textContent = dots; });
+	return td;
+}
+
+function renderPrice(oracle, bondage) {
+	const td = document.createElement('td');
+	bondage.calcZapForDots({
+		provider: oracle.provider,
+		endpoint: oracle.endpoint,
+		dots: 1
+	}).then(nextPrice => { td.textContent = nextPrice; });
+	return td;
+}
+
+function renderCurve(oracle, registry) {
+	const td = document.createElement('td');
+	registry.getProviderCurve(oracle.provider, oracle.endpoint).then(curve => {
+		td.textContent = curveToString(curve);
+	});
+	return td;
+}
+
+function renderAddress(oracle) {
+	const td = document.createElement('td');
+	td.textContent = oracle.provider;
+	return td;
+}
+
 
 // converts a curve into a string
 function curveToString(curve){
@@ -125,8 +110,10 @@ function curveToString(curve){
 		if(i != length) str += " + ";
 		str += coeff;
 		if(pow != 0){
-			str += 	"x^" + pow;
+			str += "x^" + pow;
 		}
 	}
 	return str;
 }
+
+init();
