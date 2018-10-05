@@ -1,4 +1,4 @@
-function init(){
+function init() {
 	if (typeof window.web3 === 'undefined'){
 		alert("PLEASE GET METAMASK");
 		return;
@@ -10,29 +10,46 @@ function init(){
 	};
 
 	const dialog = document.getElementById('dialog');
-	window.addEventListener('hashchange', () => {
-		handleLocationChange(dialog);
+	const oraclesContainer = document.getElementById('provider-labels').parentElement;
+	window.addEventListener('hashchange', e => {
+		handleLocationChange(dialog, e.oldURL);
 	});
 	window.addEventListener('load', () => {
 		dialogPolyfill.registerDialog(dialog);
-		const handleDialogClose = () => { location.hash = '0'; }
-		dialog.addEventListener('close', handleDialogClose);
-		dialog.addEventListener('cancel', handleDialogClose);
-		handleLocationChange(dialog);
+		dialog.addEventListener('close', () => { location.hash = '0'; });
 	});
 
-	render(new zapjs.ZapRegistry(options), new zapjs.ZapBondage(options), document.getElementById('provider-labels').parentElement);
+	render(new zapjs.ZapRegistry(options), new zapjs.ZapBondage(options), oraclesContainer).then(() => {
+		handleLocationChange(dialog);
+	});
 }
 
-function handleLocationChange(dialog) {
-	if (!/^#0x[0-9a-fA-F]{40}.+$/.test(location.hash)) {
+function removeHighligth(element) {
+	if (!element) return;
+	setTimeout(() => { element.classList.remove('highlight'); }, 1500);
+}
+
+function addHighlight(element) {
+	if (!element) return;
+	element.scrollIntoView({
+		behavior: 'smooth',
+		block: 'center',
+		inline: 'center',
+	});
+	element.classList.add('highlight');
+}
+
+function handleLocationChange(dialog, oldURL) {
+	if (oldURL) removeHighligth(document.getElementById('_' + oldURL.split('#')[1]));
+	const addressRe = /^0x[0-9a-fA-F]{40}.+$/;
+	if (!addressRe.test(location.hash.slice(1))) {
 		if (dialog.hasAttribute('open')) dialog.close();
 		document.documentElement.classList.remove('dialog-openned');
 		return;
 	}
+	document.documentElement.classList.add('dialog-openned');
 	const provider = location.hash.slice(1, 43);
 	const endpoint = location.hash.slice(43);
-	document.documentElement.classList.add('dialog-openned');
 	dialog.showModal();
 	const container = dialog.lastElementChild;
 	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
@@ -41,6 +58,7 @@ function handleLocationChange(dialog) {
 		.then(response => {
 			container.innerHTML = marked(response);
 		}).catch(console.error);
+	addHighlight(document.getElementById('_' + provider + endpoint));
 }
 
 function getAllProvidersWithEndpointsAndTitles(registry) {
@@ -58,7 +76,7 @@ function getAllProvidersWithEndpointsAndTitles(registry) {
 }
 
 function render(registry, bondage, container) {
-	getAllProvidersWithEndpointsAndTitles(registry).then(oracles => {
+	return getAllProvidersWithEndpointsAndTitles(registry).then(oracles => {
 		oracles.forEach(oracle => {
 			container.appendChild(renderOracle(oracle, registry, bondage));
 		});
@@ -67,6 +85,7 @@ function render(registry, bondage, container) {
 
 function renderOracle(oracle, registry, bondage) {
 	const tr = document.createElement('tr');
+	tr.id = '_' + oracle.provider + oracle.endpoint;
 	tr.className = 'provider-listing';
 	tr.appendChild(renderTitle(oracle));
 	tr.appendChild(renderEndpoint(oracle));

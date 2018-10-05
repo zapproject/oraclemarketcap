@@ -31,6 +31,7 @@ html {
 
 html.dialog-openned {
 	overflow-y: hidden;
+	padding-right: 11px;
 }
 
 body {
@@ -94,20 +95,28 @@ main {
 .provider-listing {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	border-radius: 5px;
+	overflow: hidden;
 }
 
 .provider-listing > td {
   background-color: rgba(250,250,252,0.7);
   vertical-align: middle;
-  padding: 15px;
+	padding: 15px;
+	transition: background-color .5s ease-out;
 }
 
 .provider-listing > td:first-child {
 	border-radius: 5px 0 0 5px;
+	overflow: hidden;
 }
 
 .provider-listing > td:last-child {
 	border-radius: 0 5px 5px 0;
+	overflow: hidden;
+}
+
+.provider-listing.highlight > td {
+	background-color: rgba(66, 230, 165, 0.4);
 }
 
 #load-more {
