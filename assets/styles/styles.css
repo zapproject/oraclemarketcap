@@ -25,6 +25,14 @@ time, mark, audio, video {
 	vertical-align: baseline;
 }
 
+html {
+	overflow-y: scroll;
+}
+
+html.dialog-openned {
+	overflow-y: hidden;
+}
+
 body {
 	background-color: #fff;
 /*  background: radial-gradient(ellipse farthest-corner at center top, #61CFFF, #0078FE) no-repeat;*/

@@ -27,10 +27,12 @@ function init(){
 function handleLocationChange(dialog) {
 	if (!/^#0x[0-9a-fA-F]{40}.+$/.test(location.hash)) {
 		if (dialog.hasAttribute('open')) dialog.close();
+		document.documentElement.classList.remove('dialog-openned');
 		return;
 	}
 	const provider = location.hash.slice(1, 43);
 	const endpoint = location.hash.slice(43);
+	document.documentElement.classList.add('dialog-openned');
 	dialog.showModal();
 	const container = dialog.lastElementChild;
 	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
