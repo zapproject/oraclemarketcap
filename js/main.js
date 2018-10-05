@@ -8,15 +8,44 @@ function init(){
 		networkId: 42,
 		networkProvider: web3.currentProvider
 	};
+
+	const dialog = document.getElementById('dialog');
+	window.addEventListener('hashchange', () => {
+		handleLocationChange(dialog);
+	});
+	window.addEventListener('load', () => {
+		dialogPolyfill.registerDialog(dialog);
+		const handleDialogClose = () => { location.hash = '0'; }
+		dialog.addEventListener('close', handleDialogClose);
+		dialog.addEventListener('cancel', handleDialogClose);
+		handleLocationChange(dialog);
+	});
+
 	render(new zapjs.ZapRegistry(options), new zapjs.ZapBondage(options), document.getElementById('provider-labels').parentElement);
+}
+
+function handleLocationChange(dialog) {
+	if (!/^#0x[0-9a-fA-F]{40}.+$/.test(location.hash)) {
+		if (dialog.hasAttribute('open')) dialog.close();
+		return;
+	}
+	const provider = location.hash.slice(1, 43);
+	const endpoint = location.hash.slice(43);
+	dialog.showModal();
+	const container = dialog.lastElementChild;
+	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
+	fetch('https://raw.githubusercontent.com/zapproject/zap-monorepo/master/README.md')
+		.then(response => response.text())
+		.then(response => {
+			container.innerHTML = marked(response);
+		}).catch(console.error);
 }
 
 function getAllProvidersWithEndpointsAndTitles(registry) {
 	return registry.getAllProviders().then(providers => Promise.all([
 		Promise.all(providers.map(provider => registry.getProviderTitle(provider))),
 		Promise.all(providers.map(provider => registry.getProviderEndpoints(provider).then(endpoints => ({provider, endpoints})))),
-	]))
-	.then(([providerTitles, endpointsByProvider]) =>
+	])).then(([providerTitles, endpointsByProvider]) =>
 		endpointsByProvider.reduce((allEndpoints, {provider, endpoints}, providerIndex) =>
 			allEndpoints.concat(endpoints.map(endpoint => ({
 				endpoint: endpoint,
@@ -47,15 +76,25 @@ function renderOracle(oracle, registry, bondage) {
 	return tr;
 }
 
+function oracleLink(oracle) {
+	const a = document.createElement('a');
+	a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
+	return a;
+}
+
 function renderTitle(oracle) {
 	const td = document.createElement('td');
-	td.textContent = oracle.title;
+	const a = oracleLink(oracle);
+	a.textContent = oracle.title;
+	td.appendChild(a);
 	return td;
 }
 
 function renderEndpoint(oracle) {
 	const td = document.createElement('td');
-	td.textContent = oracle.endpoint;
+	const a = oracleLink(oracle);
+	a.textContent = oracle.endpoint;
+	td.appendChild(a);
 	return td;
 }
 

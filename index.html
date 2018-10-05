@@ -4,11 +4,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Oracle Market Cap</title>
-
 	<link rel="stylesheet" href="./assets/styles/styles.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.10/dialog-polyfill.min.css">
 	<link rel="stylesheet" href="./assets/styles/main.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
 </head>
 
 <body>
@@ -104,8 +104,15 @@
 		</div>
 	</footer>
 
+	<dialog id="dialog">
+		<a class="close" href="#">&times;</a>
+		<div class="markdown-body"></div>
+	</dialog>
+
+	<script src="./js/ipfs-utils.js"></script>
 	<script src="./js/zapjs.js"></script>
 	<script src="./js/main.js"></script>
-
+	<script defer async src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.5.1/marked.min.js"></script>
+	<script defer async src="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.10/dialog-polyfill.min.js"></script>
 </body>
 </html>
