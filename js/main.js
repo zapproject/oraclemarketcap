@@ -31,28 +31,27 @@ function removeHighligth(element) {
 
 function addHighlight(element) {
 	if (!element) return;
-	element.scrollIntoView({
+	element.classList.add('highlight');
+	if ('scrollIntoView' in element) element.scrollIntoView({
 		behavior: 'smooth',
 		block: 'center',
 		inline: 'center',
 	});
-	element.classList.add('highlight');
 }
 
 function handleLocationChange(dialog, oldURL) {
 	if (oldURL) removeHighligth(document.getElementById('_' + oldURL.split('#')[1]));
-	const addressRe = /^0x[0-9a-fA-F]{40}.+$/;
-	if (!addressRe.test(location.hash.slice(1))) {
-		if (dialog.hasAttribute('open')) dialog.close();
-		document.documentElement.classList.remove('dialog-openned');
+	if (dialog.hasAttribute('open')) dialog.close();
+	document.documentElement.classList.remove('dialog-openned');
+	if (!/^0x[0-9a-fA-F]{40}.+$/.test(location.hash.slice(1))) {
 		return;
 	}
 	document.documentElement.classList.add('dialog-openned');
 	const provider = location.hash.slice(1, 43);
 	const endpoint = location.hash.slice(43);
-	dialog.showModal();
 	const container = dialog.lastElementChild;
 	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
+	dialog.showModal();
 	fetch('https://raw.githubusercontent.com/zapproject/zap-monorepo/master/README.md')
 		.then(response => response.text())
 		.then(response => {
