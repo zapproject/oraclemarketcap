@@ -1,4 +1,5 @@
 window.ipfsUtils = (function(){
+  var addressRe = /^Qm[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{44}$/
   var ipfsUtils = {};
   var A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
   // Base58 Encoder/Decoder https://gist.github.com/diafygi/90a3e80ca1c2793220e5/
@@ -27,6 +28,9 @@ window.ipfsUtils = (function(){
   };
   ipfsUtils.addressToHex = function(S) {
     return bytesToHex(ipfsUtils.addressToBytes(S));
+  }
+  ipfsUtils.isIpfsAddress = function(value) {
+    return addressRe.test(value);
   }
   return ipfsUtils;
 }());

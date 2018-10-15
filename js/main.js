@@ -8,19 +8,19 @@ function init() {
 		networkId: 42,
 		networkProvider: web3.currentProvider
 	};
-
+	const registry = new zapjs.ZapRegistry(options);
 	const dialog = document.getElementById('dialog');
 	const oraclesContainer = document.getElementById('provider-labels').parentElement;
 	window.addEventListener('hashchange', e => {
-		handleLocationChange(dialog, e.oldURL);
+		handleLocationChange(registry, dialog, e.oldURL);
 	});
 	window.addEventListener('load', () => {
 		dialogPolyfill.registerDialog(dialog);
 		dialog.addEventListener('close', () => { location.hash = '0'; });
 	});
 
-	render(new zapjs.ZapRegistry(options), new zapjs.ZapBondage(options), oraclesContainer).then(() => {
-		handleLocationChange(dialog);
+	render(registry, new zapjs.ZapBondage(options), oraclesContainer).then(() => {
+		handleLocationChange(registry, dialog);
 	});
 }
 
@@ -39,7 +39,7 @@ function addHighlight(element) {
 	});
 }
 
-function handleLocationChange(dialog, oldURL) {
+function handleLocationChange(registry, dialog, oldURL) {
 	if (oldURL) removeHighligth(document.getElementById('_' + oldURL.split('#')[1]));
 	if (dialog.hasAttribute('open')) dialog.close();
 	document.documentElement.classList.remove('dialog-openned');
@@ -52,11 +52,20 @@ function handleLocationChange(dialog, oldURL) {
 	const container = dialog.lastElementChild;
 	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
 	dialog.showModal();
-	fetch('https://raw.githubusercontent.com/zapproject/zap-monorepo/master/README.md')
+	getEndpointInfoUrl(provider, endpoint, registry)
+		.then(address => Promise.race([
+			fetch('https://cloudflare-ipfs.com/ipfs/' + address),
+			new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout')); }, 2000); }),
+		]))
 		.then(response => response.text())
 		.then(response => {
 			container.innerHTML = marked(response);
-		}).catch(console.error);
+		}).catch(error => {
+			const p = document.createElement('p');
+			p.textContent = error.message;
+			container.appendChild(p);
+			console.log(error);
+		});
 	addHighlight(document.getElementById('_' + provider + endpoint));
 }
 
@@ -74,6 +83,15 @@ function getAllProvidersWithEndpointsAndTitles(registry) {
 	).catch(console.error);
 }
 
+function getEndpointInfoUrl(address, endpoint, registry) {
+	return registry.contract.methods.getEndPointParams(address, registry.provider.utils.utf8ToHex(endpoint)).call().then(params => {
+		if (!params.length) throw new Error('No endpoint IPFS url param ');
+		const address = ipfsUtils.hexToAddress(params[0].replace('0x', ''));
+		if (!ipfsUtils.isIpfsAddress(address)) throw new Error('Endpoint first param is not a valid IPFS hash');
+		return address;
+	});
+}
+
 function render(registry, bondage, container) {
 	return getAllProvidersWithEndpointsAndTitles(registry).then(oracles => {
 		oracles.forEach(oracle => {
@@ -87,7 +105,7 @@ function renderOracle(oracle, registry, bondage) {
 	tr.id = '_' + oracle.provider + oracle.endpoint;
 	tr.className = 'provider-listing';
 	tr.appendChild(renderTitle(oracle));
-	tr.appendChild(renderEndpoint(oracle));
+	tr.appendChild(renderEndpoint(oracle, registry));
 	tr.appendChild(renderZap(oracle, bondage));
 	tr.appendChild(renderDots(oracle, bondage));
 	tr.appendChild(renderPrice(oracle, bondage));
@@ -98,23 +116,29 @@ function renderOracle(oracle, registry, bondage) {
 
 function oracleLink(oracle) {
 	const a = document.createElement('a');
-	a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
+	a.textContent = oracle.title;
+	// a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
 	return a;
 }
 
 function renderTitle(oracle) {
 	const td = document.createElement('td');
-	const a = oracleLink(oracle);
-	a.textContent = oracle.title;
-	td.appendChild(a);
+	td.appendChild(oracleLink(oracle));
 	return td;
 }
 
-function renderEndpoint(oracle) {
-	const td = document.createElement('td');
-	const a = oracleLink(oracle);
+function endpointLink(oracle, registry) {
+	const a = document.createElement('a');
 	a.textContent = oracle.endpoint;
-	td.appendChild(a);
+	getEndpointInfoUrl(oracle.provider, oracle.endpoint, registry).then(() => {
+		a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
+	});
+	return a;
+}
+
+function renderEndpoint(oracle, registry) {
+	const td = document.createElement('td');
+	td.appendChild(endpointLink(oracle, registry));
 	return td;
 }
 
