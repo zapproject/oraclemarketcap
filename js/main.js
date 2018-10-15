@@ -107,9 +107,15 @@ function renderOracle(oracle, registry, bondage) {
 	tr.appendChild(renderTitle(oracle));
 	tr.appendChild(renderEndpoint(oracle, registry));
 	tr.appendChild(renderZap(oracle, bondage));
-	tr.appendChild(renderDots(oracle, bondage));
-	tr.appendChild(renderPrice(oracle, bondage));
-	tr.appendChild(renderCurve(oracle, registry));
+
+	const dotsTd = tr.appendChild(document.createElement('td'));
+	const priceTd = tr.appendChild(document.createElement('td'));
+	const curveTd = tr.appendChild(document.createElement('td'));
+
+	const dotsPromise = renderDots(oracle, bondage, dotsTd);
+	const curvePromise = renderCurve(oracle, registry, curveTd, dotsPromise); // depends on dots
+	renderPrice(priceTd, dotsPromise, curvePromise); // depends on dots and curve
+
 	tr.appendChild(renderAddress(oracle));
 	return tr;
 }
@@ -148,28 +154,30 @@ function renderZap(oracle, bondage) {
 	return td;
 }
 
-function renderDots(oracle, bondage) {
-	const td = document.createElement('td');
-	bondage.getDotsIssued(oracle).then(dots => { td.textContent = dots; });
-	return td;
+function renderDots(oracle, bondage, td) {
+	const promise = bondage.getDotsIssued(oracle).then(Number);
+	promise.then(dots => { td.textContent = dots; });
+	return promise;
 }
 
-function renderPrice(oracle, bondage) {
-	const td = document.createElement('td');
-	bondage.calcZapForDots({
-		provider: oracle.provider,
-		endpoint: oracle.endpoint,
-		dots: 1
-	}).then(nextPrice => { td.textContent = nextPrice; });
-	return td;
+function renderPrice(td, dotsPromise, curvePromise) {
+	return Promise.all([dotsPromise, curvePromise])
+		.then(([dots, curve]) => {
+			td.textContent = curve.getPrice(Math.min(dots + 1, curve.max));
+		}).catch(console.error);
 }
 
-function renderCurve(oracle, registry) {
-	const td = document.createElement('td');
-	registry.getProviderCurve(oracle.provider, oracle.endpoint).then(curve => {
-		td.textContent = curveToString(curve);
-	});
-	return td;
+function renderCurve(oracle, registry, td, dotsPromise) {
+	td.className = 'curve-chart';
+	return Promise.all([dotsPromise, registry.getProviderCurve(oracle.provider, oracle.endpoint)])
+		.then(([dots, curve]) => {
+			const lineChart = new ZapCurve.CurveLineChart(td);
+			lineChart.draw(curve.values, Math.min(dots + 1, curve.max));
+			const div = document.createElement('div');
+			div.textContent = curveToString(curve);
+			td.appendChild(div);
+			return curve;
+		}).catch(console.error);
 }
 
 function renderAddress(oracle) {

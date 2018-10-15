@@ -105,6 +105,17 @@ main {
 	transition: background-color .5s ease-out;
 }
 
+.curve-chart {
+	position: relative;
+}
+
+.curve-chart > div {
+	position: absolute;
+	top: 17px;
+	left: 17px;
+	color: #666;
+}
+
 .provider-listing > td:first-child {
 	border-radius: 5px 0 0 5px;
 	overflow: hidden;
