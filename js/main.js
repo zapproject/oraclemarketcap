@@ -1,5 +1,5 @@
 function init() {
-	if (typeof window.web3 === 'undefined'){
+	if (typeof window.web3 === 'undefined') {
 		alert("PLEASE GET METAMASK");
 		return;
 	}
@@ -21,7 +21,7 @@ function init() {
 
 	render(registry, new zapjs.ZapBondage(options), oraclesContainer).then(renderedOracles => {
 		handleLocationChange(registry, dialog);
-		filter(renderedOracles, document.getElementById('search-term'));
+		initFilter(renderedOracles, document.getElementById('search-term'));
 	});
 }
 
@@ -34,7 +34,7 @@ function hideElement(el) {
 	el.setAttribute('hidden', true);
 }
 
-function filter(renderedOracles, input) {
+function initFilter(renderedOracles, input) {
 	let timeout;
 	input.addEventListener('input', () => {
 		if (timeout) clearTimeout(timeout);
@@ -46,10 +46,11 @@ function filter(renderedOracles, input) {
 			}
 			if (input.value.length < 3) return;
 			renderedOracles.forEach(({oracle, tr}) => {
-				const show = oracle.provider.toLowerCase().indexOf(search) !== -1
-				|| oracle.endpoint.toLowerCase().indexOf(search) !== -1
-				|| oracle.title.toLowerCase().indexOf(search) !== -1;
-				if (show) {
+				if (
+					oracle.provider.toLowerCase().indexOf(search) !== -1 ||
+					oracle.endpoint.toLowerCase().indexOf(search) !== -1 ||
+					oracle.title.toLowerCase().indexOf(search) !== -1
+				) {
 					showElement(tr);
 				} else {
 					hideElement(tr);
@@ -78,19 +79,33 @@ function handleLocationChange(registry, dialog, oldURL) {
 	if (oldURL) removeHighligth(document.getElementById('_' + oldURL.split('#')[1]));
 	if (dialog.hasAttribute('open')) dialog.close();
 	document.documentElement.classList.remove('dialog-openned');
-	if (!/^0x[0-9a-fA-F]{40}.+$/.test(location.hash.slice(1))) {
+	const hash = location.hash.trim();
+	if (!/^(provider|endpoint)0x[0-9a-fA-F]{40}.*$/.test(hash.slice(1))) {
 		return;
 	}
 	document.documentElement.classList.add('dialog-openned');
-	const provider = location.hash.slice(1, 43);
-	const endpoint = location.hash.slice(43);
+	const provider = hash.slice(9, 51);
+	const endpoint = hash.slice(51);
+	const target = endpoint ? hash.slice(1, 9) : 'provider';
 	const container = dialog.lastElementChild;
-	container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
+	let infoRequst;
+	switch(target) {
+		case 'endpoint':
+			infoRequst = getEndpointInfoUrl(provider, endpoint, registry);
+			container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
+			break;
+		case 'provider':
+			infoRequst = getProviderInfoUrl(provider, registry);
+			container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}</p>`;
+			break;
+		default:
+			return;
+	}
 	dialog.showModal();
-	getEndpointInfoUrl(provider, endpoint, registry)
+	infoRequst
 		.then(address => Promise.race([
 			fetch('https://cloudflare-ipfs.com/ipfs/' + address),
-			new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout')); }, 2000); }),
+			new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout.')); }, 2000); }),
 		]))
 		.then(response => response.text())
 		.then(response => {
@@ -101,7 +116,7 @@ function handleLocationChange(registry, dialog, oldURL) {
 			container.appendChild(p);
 			console.log(error);
 		});
-	addHighlight(document.getElementById('_' + provider + endpoint));
+	addHighlight(document.getElementById('_' + provider + endpoint) || document.getElementsByClassName(provider)[0]);
 }
 
 function getAllProvidersWithEndpointsAndTitles(registry) {
@@ -122,8 +137,22 @@ function getEndpointInfoUrl(address, endpoint, registry) {
 	return registry.contract.methods.getEndPointParams(address, registry.provider.utils.utf8ToHex(endpoint)).call().then(params => {
 		if (!params.length) throw new Error('No endpoint IPFS url param ');
 		const address = ipfsUtils.hexToAddress(params[0].replace('0x', ''));
-		if (!ipfsUtils.isIpfsAddress(address)) throw new Error('Endpoint first param is not a valid IPFS hash');
+		if (!ipfsUtils.isIpfsAddress(address)) throw new Error('Endpoint first param is not a valid IPFS hash.');
 		return address;
+	});
+}
+
+function getProviderInfoUrl(address, registry) {
+	const request = registry.contract.methods.getProviderParameter(address, registry.provider.utils.utf8ToHex('profile')).call();
+	return new Promise((resolve, reject) => {
+		request.then(parameter => {
+			if (!parameter) reject(new Error('No provider IPFS url parameter.'));
+			const address = ipfsUtils.hexToAddress(parameter.replace('0x', ''));
+			if (!ipfsUtils.isIpfsAddress(address)) reject(new Error('Provider `profile` parameter is not a valid IPFS hash.'));
+			resolve(address);
+		}).catch(() => {
+			reject(new Error('Error occured. Perhaps provider parameter `profile` is not set.'));
+		});
 	});
 }
 
@@ -136,49 +165,43 @@ function render(registry, bondage, container) {
 
 function renderOracle(oracle, registry, bondage) {
 	const tr = document.createElement('tr');
+	tr.className = 'provider-listing ' + oracle.provider;
 	tr.id = '_' + oracle.provider + oracle.endpoint;
-	tr.className = 'provider-listing';
-	tr.appendChild(renderTitle(oracle));
+
+	tr.appendChild(renderTitle(oracle, registry));
 	tr.appendChild(renderEndpoint(oracle, registry));
 	tr.appendChild(renderZap(oracle, bondage));
 
 	const dotsTd = tr.appendChild(document.createElement('td'));
 	const priceTd = tr.appendChild(document.createElement('td'));
 	const curveTd = tr.appendChild(document.createElement('td'));
-
 	const dotsPromise = renderDots(oracle, bondage, dotsTd);
-	const curvePromise = renderCurve(oracle, registry, curveTd, dotsPromise); // depends on dots
-	renderPrice(priceTd, dotsPromise, curvePromise); // depends on dots and curve
+	const curvePromise = renderCurve(oracle, registry, curveTd, dotsPromise);
+	renderPrice(priceTd, dotsPromise, curvePromise);
 
 	tr.appendChild(renderAddress(oracle));
 	return tr;
 }
 
-function oracleLink(oracle) {
+function renderTitle(oracle, registry) {
+	const td = document.createElement('td');
 	const a = document.createElement('a');
 	a.textContent = oracle.title;
-	// a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
-	return a;
-}
-
-function renderTitle(oracle) {
-	const td = document.createElement('td');
-	td.appendChild(oracleLink(oracle));
-	return td;
-}
-
-function endpointLink(oracle, registry) {
-	const a = document.createElement('a');
-	a.textContent = oracle.endpoint;
-	getEndpointInfoUrl(oracle.provider, oracle.endpoint, registry).then(() => {
-		a.setAttribute('href', '#' + oracle.provider + oracle.endpoint);
+	getProviderInfoUrl(oracle.provider, registry).then(() => {
+		a.setAttribute('href', '#provider' + oracle.provider + oracle.endpoint);
 	});
-	return a;
+	td.appendChild(a);
+	return td;
 }
 
 function renderEndpoint(oracle, registry) {
 	const td = document.createElement('td');
-	td.appendChild(endpointLink(oracle, registry));
+	const a = document.createElement('a');
+	a.textContent = oracle.endpoint;
+	getEndpointInfoUrl(oracle.provider, oracle.endpoint, registry).then(() => {
+		a.setAttribute('href', '#endpoint' + oracle.provider + oracle.endpoint);
+	});
+	td.appendChild(a);
 	return td;
 }
 
@@ -208,7 +231,12 @@ function renderCurve(oracle, registry, td, dotsPromise) {
 			const lineChart = new ZapCurve.CurveLineChart(td);
 			lineChart.draw(curve.values, Math.min(dots + 1, curve.max));
 			const div = document.createElement('div');
-			div.textContent = curveToString(curve);
+			const div1 = document.createElement('div');
+			const div2 = document.createElement('div');
+			div1.textContent = JSON.stringify(curve.values);
+			div2.textContent = curveToString(curve);
+			div.appendChild(div1);
+			div.appendChild(div2);
 			td.appendChild(div);
 			return curve;
 		}).catch(console.error);
