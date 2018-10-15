@@ -76,7 +76,7 @@ function addHighlight(element) {
 }
 
 function handleLocationChange(registry, dialog, oldURL) {
-	if (oldURL) removeHighligth(document.getElementById('_' + oldURL.split('#')[1]));
+	if (oldURL) removeHighligth(document.getElementById('_' + (oldURL.split('#')[1] || '').slice(8)));
 	if (dialog.hasAttribute('open')) dialog.close();
 	document.documentElement.classList.remove('dialog-openned');
 	const hash = location.hash.trim();
