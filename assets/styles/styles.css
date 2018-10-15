@@ -223,3 +223,22 @@ canvas {
 .legal a:hover, .legal a:active {
 	text-decoration: underline;
 }
+
+.search-container {
+	padding: 5px 15px;
+}
+
+.search {
+	position: relative;
+}
+
+.search input {
+	padding-left: 25px;
+	min-width: 300px;
+}
+
+.search .fa-search {
+	position: absolute;
+	left: 5px;
+	top: 4px;
+}

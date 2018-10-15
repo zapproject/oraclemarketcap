@@ -19,9 +19,44 @@ function init() {
 		dialog.addEventListener('close', () => { location.hash = '0'; });
 	});
 
-	render(registry, new zapjs.ZapBondage(options), oraclesContainer).then(() => {
+	render(registry, new zapjs.ZapBondage(options), oraclesContainer).then(renderedOracles => {
 		handleLocationChange(registry, dialog);
+		filter(renderedOracles, document.getElementById('search-term'));
 	});
+}
+
+function showElement(el) {
+	if (el.hasAttribute('hidden')) el.removeAttribute('hidden');
+}
+
+function hideElement(el) {
+	if (el.hasAttribute('hidden')) return;
+	el.setAttribute('hidden', true);
+}
+
+function filter(renderedOracles, input) {
+	let timeout;
+	input.addEventListener('input', () => {
+		if (timeout) clearTimeout(timeout);
+		timeout = setTimeout(() => {
+			const search = input.value.toLowerCase();
+			if (input.value.length === 0) {
+				renderedOracles.forEach(({tr}) => showElement(tr));
+				return;
+			}
+			if (input.value.length < 3) return;
+			renderedOracles.forEach(({oracle, tr}) => {
+				const show = oracle.provider.toLowerCase().indexOf(search) !== -1
+				|| oracle.endpoint.toLowerCase().indexOf(search) !== -1
+				|| oracle.title.toLowerCase().indexOf(search) !== -1;
+				if (show) {
+					showElement(tr);
+				} else {
+					hideElement(tr);
+				}
+			});
+		}, 300);
+	})
 }
 
 function removeHighligth(element) {
@@ -93,11 +128,10 @@ function getEndpointInfoUrl(address, endpoint, registry) {
 }
 
 function render(registry, bondage, container) {
-	return getAllProvidersWithEndpointsAndTitles(registry).then(oracles => {
-		oracles.forEach(oracle => {
-			container.appendChild(renderOracle(oracle, registry, bondage));
-		});
-	}).catch(console.error);
+	return getAllProvidersWithEndpointsAndTitles(registry).then(oracles => oracles.map(oracle => {
+		const tr = container.appendChild(renderOracle(oracle, registry, bondage));
+		return {tr, oracle}
+	})).catch(console.error);
 }
 
 function renderOracle(oracle, registry, bondage) {
