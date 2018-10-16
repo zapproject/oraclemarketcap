@@ -1,16 +1,40 @@
 function init() {
-	if (typeof window.web3 === 'undefined') {
-		alert("PLEASE GET METAMASK");
-		return;
-	}
-	// create the registry object
-	const options = {
-		networkId: 42,
-		networkProvider: web3.currentProvider
-	};
-	const registry = new zapjs.ZapRegistry(options);
-	const dialog = document.getElementById('dialog');
+	const networks = [
+		{
+			name: 'Kovan',
+			networkProvider: 'wss://kovan.infura.io/ws',
+			networkId: 42
+		},
+		{
+			name: 'Mainnet',
+			networkProvider: 'wss://mainnet.infura.io/ws',
+			networkId: 1,
+			disabled: true
+		},
+		{
+			name: 'Localhost 8546',
+			networkProvider: 'ws://localhost:8546',
+			networkId: 1337,
+			disabled: true
+		}
+	];
+	let registry;
+	let bondage;
+	let prevRenderedOracles = [];
 	const oraclesContainer = document.getElementById('provider-labels').parentElement;
+	const handleNetworkChange = (network) => {
+		registry = new zapjs.ZapRegistry(network);
+		bondage = new zapjs.ZapBondage(network);
+		prevRenderedOracles.forEach(({tr}) => { oraclesContainer.removeChild(tr); }); // clear old oracles when network is changed
+		render(registry, bondage, oraclesContainer).then(renderedOracles => {
+			prevRenderedOracles = renderedOracles;
+			handleLocationChange(registry, dialog);
+			initFilter(renderedOracles, document.getElementById('search-term'));
+		});
+	}
+	renderNetworkOptionsSelect(document.getElementById('network-select'), networks, handleNetworkChange);
+	handleNetworkChange(networks[0]); // start with Kovan
+	const dialog = document.getElementById('dialog');
 	window.addEventListener('hashchange', e => {
 		handleLocationChange(registry, dialog, e.oldURL);
 	});
@@ -18,24 +42,32 @@ function init() {
 		dialogPolyfill.registerDialog(dialog);
 		dialog.addEventListener('close', () => { location.hash = '0'; });
 	});
+}
 
-	render(registry, new zapjs.ZapBondage(options), oraclesContainer).then(renderedOracles => {
-		handleLocationChange(registry, dialog);
-		initFilter(renderedOracles, document.getElementById('search-term'));
+function renderNetworkOptionsSelect(select, networks, onChange) {
+	networks.forEach(network => {
+		const option = document.createElement('option');
+		option.value = network.networkId;
+		option.textContent = network.name;
+		if (network.disabled) option.disabled = true;
+		select.appendChild(option);
 	});
-}
-
-function showElement(el) {
-	if (el.hasAttribute('hidden')) el.removeAttribute('hidden');
-}
-
-function hideElement(el) {
-	if (el.hasAttribute('hidden')) return;
-	el.setAttribute('hidden', true);
+	select.addEventListener('change', () => {
+		const value = Number(select.value);
+		if (!value || isNaN(value)) return;
+		let i = networks.length;
+		while (i--) {
+			if (networks[i].networkId !== value) continue;
+			onChange(networks[i]);
+			break;
+		}
+	});
 }
 
 function initFilter(renderedOracles, input) {
 	let timeout;
+	const showElement = el => { if (el.hasAttribute('hidden')) el.removeAttribute('hidden') };
+	const hideElement = el => { if (!el.hasAttribute('hidden')) el.setAttribute('hidden', true) }
 	input.addEventListener('input', () => {
 		if (timeout) clearTimeout(timeout);
 		timeout = setTimeout(() => {
@@ -60,23 +92,11 @@ function initFilter(renderedOracles, input) {
 	})
 }
 
-function removeHighligth(element) {
-	if (!element) return;
-	setTimeout(() => { element.classList.remove('highlight'); }, 1500);
-}
-
-function addHighlight(element) {
-	if (!element) return;
-	element.classList.add('highlight');
-	if ('scrollIntoView' in element) element.scrollIntoView({
-		behavior: 'smooth',
-		block: 'center',
-		inline: 'center',
-	});
-}
-
 function handleLocationChange(registry, dialog, oldURL) {
-	if (oldURL) removeHighligth(document.getElementById('_' + (oldURL.split('#')[1] || '').slice(8)));
+	if (oldURL) {
+		let element = document.getElementById('_' + (oldURL.split('#')[1] || '').slice(8));
+		if (element) setTimeout(() => { element.classList.remove('highlight'); }, 1500);
+	}
 	if (dialog.hasAttribute('open')) dialog.close();
 	document.documentElement.classList.remove('dialog-openned');
 	const hash = location.hash.trim();
@@ -114,9 +134,15 @@ function handleLocationChange(registry, dialog, oldURL) {
 			const p = document.createElement('p');
 			p.textContent = error.message;
 			container.appendChild(p);
-			console.log(error);
 		});
-	addHighlight(document.getElementById('_' + provider + endpoint) || document.getElementsByClassName(provider)[0]);
+	let element = document.getElementById('_' + provider + endpoint) || document.getElementsByClassName(provider)[0];
+	if (!element) return;
+	element.classList.add('highlight');
+	if ('scrollIntoView' in element) element.scrollIntoView({
+		behavior: 'smooth',
+		block: 'center',
+		inline: 'center',
+	});
 }
 
 function getAllProvidersWithEndpointsAndTitles(registry) {
