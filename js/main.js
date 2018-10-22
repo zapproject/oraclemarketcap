@@ -254,7 +254,7 @@ function renderCurve(oracle, registry, td, dotsPromise) {
 	td.className = 'curve-chart';
 	return Promise.all([dotsPromise, registry.getProviderCurve(oracle.provider, oracle.endpoint)])
 		.then(([dots, curve]) => {
-			const lineChart = new ZapCurve.CurveLineChart(td);
+			const lineChart = new ZapCurve.CurveLineChart(td, {width: 180, height: 60});
 			lineChart.draw(curve.values, Math.min(dots + 1, curve.max));
 			const div = document.createElement('div');
 			const div1 = document.createElement('div');
