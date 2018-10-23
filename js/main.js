@@ -130,3 +130,20 @@ function curveToString(curve){
 	}
 	return str;
 }
+
+
+// converts a curve into a string
+function curveToJSONSet(curve){
+	var str = curveToString(curve);
+	var y;
+	var x;
+	// create array
+	var multiArray = new Array(10);
+
+	for(var i = 0; i < 10; i++){
+		str = str.replace("x", i);
+		y = eval(str);
+		multiArray[i] = 
+	}
+	return str;
+}
