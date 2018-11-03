@@ -60,6 +60,10 @@ a {
 	text-decoration: none;
 }
 
+a[href] {
+	color: #3edfa5;
+}
+
 footer {
 	background-color: #42E6A5;
 	height: 160px;
@@ -96,6 +100,31 @@ main {
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	border-radius: 5px;
 	overflow: hidden;
+	position: relative;
+	opacity: 1;
+	transition: opacity .3s ease-out;
+}
+
+.folded-endpoint {
+	opacity: 0;
+	display: none;
+	transform: scaleX(0.97) translateX(1.5%);
+}
+.folded-endpoint.visible {
+	opacity: 1;
+	display: table-row;
+}
+.folded-endpoint > td:first-child a {
+	display: none;
+}
+/* .folded-endpoint > td:first-child {
+	display: none;
+} */
+.folded-endpoint > td {
+	/* transform: scaleX(1.03); */
+}
+.provider-listing.active > td:first-child a {
+	font-weight: 600;
 }
 
 .provider-listing > td {
@@ -103,6 +132,30 @@ main {
   vertical-align: middle;
 	padding: 15px;
 	transition: background-color .5s ease-out;
+}
+
+.oracle__show-more {
+	display: none;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 0;
+}
+.oracle__show-more::before {
+	content: 'Show more endpoints';
+	display: block;
+}
+.active .oracle__show-more::before {
+	content: 'Show less endpoints';
+	display: block;
+	font-weight: 600;
+}
+
+.first-endpoint .oracle__show-more {
+	display: block;
+	cursor: pointer;
+	color: #42E6A5;
+	font-size: 12px;
 }
 
 .curve-chart {
@@ -267,3 +320,4 @@ canvas {
 .network select {
 	height: 25px;
 }
+

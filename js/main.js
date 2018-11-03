@@ -28,12 +28,14 @@ function init() {
 		prevRenderedOracles.forEach(({tr}) => { oraclesContainer.removeChild(tr); }); // clear old oracles when network is changed
 		render(registry, bondage, oraclesContainer).then(renderedOracles => {
 			prevRenderedOracles = renderedOracles;
-			handleLocationChange(registry, dialog);
-			initFilter(renderedOracles, document.getElementById('search-term'));
-		});
+			initFoldingOracles(prevRenderedOracles);
+			handleLocationChange(registry, dialog, null, prevRenderedOracles);
+			initFilter(prevRenderedOracles, document.getElementById('search-term'));
+		}).catch(console.log);
 	}
 	renderNetworkOptionsSelect(document.getElementById('network-select'), networks, handleNetworkChange);
 	handleNetworkChange(networks[0]); // start with Kovan
+
 	const dialog = document.getElementById('dialog');
 	window.addEventListener('hashchange', e => {
 		handleLocationChange(registry, dialog, e.oldURL);
@@ -41,6 +43,22 @@ function init() {
 	window.addEventListener('load', () => {
 		dialogPolyfill.registerDialog(dialog);
 		dialog.addEventListener('close', () => { location.hash = '0'; });
+	});
+
+	let prevUnfoldedOracle = null;
+	oraclesContainer.addEventListener('click', e => {
+		if (e.target.nodeName !== 'A' || e.target.className !== 'oracle__show-more') return;
+		const oracle = e.target.getAttribute('data-oracle');
+		if (!oracle) return;
+		if (prevUnfoldedOracle) {
+			foldOracles(prevUnfoldedOracle, prevRenderedOracles);
+		}
+		if (prevUnfoldedOracle !== oracle) {
+			unfoldOracles(oracle, prevRenderedOracles);
+			prevUnfoldedOracle = oracle;
+		} else {
+			prevUnfoldedOracle = null;
+		}
 	});
 }
 
@@ -74,6 +92,7 @@ function initFilter(renderedOracles, input) {
 			const search = input.value.toLowerCase();
 			if (input.value.length === 0) {
 				renderedOracles.forEach(({tr}) => showElement(tr));
+				initFoldingOracles(renderedOracles);
 				return;
 			}
 			if (input.value.length < 3) return;
@@ -88,11 +107,12 @@ function initFilter(renderedOracles, input) {
 					hideElement(tr);
 				}
 			});
+			initFoldingOracles(renderedOracles);
 		}, 300);
 	})
 }
 
-function handleLocationChange(registry, dialog, oldURL) {
+function handleLocationChange(registry, dialog, oldURL, renderedOracles) {
 	if (oldURL) {
 		let element = document.getElementById('_' + (oldURL.split('#')[1] || '').slice(8));
 		if (element) setTimeout(() => { element.classList.remove('highlight'); }, 1500);
@@ -108,6 +128,7 @@ function handleLocationChange(registry, dialog, oldURL) {
 	const endpoint = hash.slice(51);
 	const target = endpoint ? hash.slice(1, 9) : 'provider';
 	const container = dialog.lastElementChild;
+	if (renderedOracles) unfoldOracles(provider, renderedOracles);
 	let infoRequst;
 	switch(target) {
 		case 'endpoint':
@@ -193,7 +214,6 @@ function renderOracle(oracle, registry, bondage) {
 	const tr = document.createElement('tr');
 	tr.className = 'provider-listing ' + oracle.provider;
 	tr.id = '_' + oracle.provider + oracle.endpoint;
-
 	tr.appendChild(renderTitle(oracle, registry));
 	tr.appendChild(renderEndpoint(oracle, registry));
 	tr.appendChild(renderZap(oracle, bondage));
@@ -271,7 +291,48 @@ function renderCurve(oracle, registry, td, dotsPromise) {
 function renderAddress(oracle) {
 	const td = document.createElement('td');
 	td.textContent = oracle.provider;
+	const showMore = document.createElement('a');
+	showMore.className = 'oracle__show-more';
+	showMore.setAttribute('data-oracle', oracle.provider)
+	td.appendChild(showMore);
 	return td;
+}
+
+function initFoldingOracles(renderedOracles) {
+	renderedOracles.forEach(({tr}) => {
+		tr.classList.remove('first-endpoint', 'folded-endpoint', 'visible', 'active');
+	});
+	const visibleOracles = renderedOracles.filter(({tr}) => !tr.hasAttribute('hidden'))
+	for (let i = 0, len = visibleOracles.length; i < len; i++) {
+		const {tr, oracle} = visibleOracles[i];
+		const nextRow = visibleOracles[i + 1];
+		const prevRow = visibleOracles[i - 1];
+		if (
+			(nextRow && nextRow.oracle.provider === oracle.provider) &&
+			(!prevRow || prevRow.oracle.provider !== oracle.provider)
+		) {
+			tr.classList.add('first-endpoint');
+		}
+		if (prevRow && prevRow.oracle.provider === oracle.provider) {
+			tr.classList.add('folded-endpoint');
+		}
+	}
+}
+
+function foldOracles(provider, renderedOracles) {
+	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
+	oracles[0].tr.classList.remove('active');
+	for (let i = 1, len = oracles.length; i < len; i++) {
+		oracles[i].tr.classList.remove('visible');
+	}
+}
+
+function unfoldOracles(provider, renderedOracles) {
+	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
+	oracles[0].tr.classList.add('active');
+	for (let i = 1, len = oracles.length; i < len; i++) {
+		oracles[i].tr.classList.add('visible');
+	}
 }
 
 
