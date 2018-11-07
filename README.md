@@ -1,3 +1,4 @@
+
 ## How to Initialize mySQL Database 
 
 `CREATE DATABASE oraclemarketcap`
@@ -11,7 +12,9 @@ zap_value bigint UNSIGNED NOT NULL DEFAULT 0,
 dot_value bigint UNSIGNED NOT NULL DEFAULT 0,
 dot_issued bigint UNSIGNED NOT NULL DEFAULT 0, 
 timestamp timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-curve TEXT NOT NULL,
+constants TEXT NOT NULL,
+parts TEXT NOT NULL,
+dividers TEXT NOT NULL,
 primary key(provider_address, endpoint_name));
 
 CREATE TABLE providers(
