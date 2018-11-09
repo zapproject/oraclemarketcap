@@ -5,10 +5,7 @@
 	<meta charset="UTF-8">
 	<title>Oracle Market Cap</title>
 	<link rel="stylesheet" href="./assets/styles/styles.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.10/dialog-polyfill.min.css">
 	<link rel="stylesheet" href="./assets/styles/main.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css">
 </head>
 
 <body>
@@ -17,65 +14,36 @@
 		<div id="logo">
 			<img src="./assets/img/omc-header-logo.png" alt="Oracle Market Cap Logo" id="omc-header-logo">
 		</div>
+		<div class="network-container">
+			<label class="network">
+				Network
+				<select id="network-select"></select>
+			</label>
+		</div>
+		<div class="search-container">
+			<div class="search">
+				<input type="text" id="search-term" placeholder="Search">
+				<img src="/assets/img/search-icon.svg" alt="">
+			</div>
+		</div>
 	</header>
 
 
-	<!-- Search Bar -->
-	<div class="search-container">
-		<div class="search">
-			<input type="text" id="search-term" placeholder="Search by address or title or endpoint">
-			<i class="fa fa-search"></i>
-		</div>
-		<label class="network">
-			Network
-			<select id="network-select"></select>
-		</label>
-	</div>
-
-
-	<section class="table-container">
-
-		<!-- List of Providers/Endpoints -->
+	<main class="table-container">
+		<div class="table-header-background"></div>
 		<!-- Oracle Title | Endpoint | Oracle Cap | Zap per Dot | Volume(24Hr) | Circulating Supply | Bonding Curve[Chart] | Change(24Hr)[Chart] -->
 		<table class="provider-table">
-			<colgroup>
-				<col id="title-col">
-				<col id="endpoint-col">
-				<col id="boundZap-col">
-				<col id="boundDots-col">
-				<col id="price-col">
-				<col id="curve-col">
-				<col id="address-col">
-			</colgroup>
 			<tr id="provider-labels">
-				<th class="table-title">
-					Oracle Title
-				</th>
-				<th class="table-title">
-					Endpoint
-				</th>
-				<th class="table-title">
-					Zap Bound
-				</th>
-				<th class="table-title">
-					DOTs Bound
-				</th>
-				<th class="table-title">
-					Price of DOT
-				</th>
-				<th class="table-title">
-					Bonding Curve
-				</th>
-				<th class="table-title">
-					Oracle Address
-				</th>
-				<!-- <th class="table-title">
-					Change(7D)
-				</th> -->
+				<th class="table-title">Oracle Title</th>
+				<th class="table-title">Endpoint</th>
+				<th class="table-title">Zap Bound</th>
+				<th class="table-title">DOTs Bound</th>
+				<th class="table-title">Price of DOT</th>
+				<th class="table-title">Bonding Curve</th>
+				<th class="table-title">Oracle Address</th>
 			</tr>
 		</table>
-		<!-- <button id="load-more">Load More</button> -->
-	</section>
+	</main>
 
 
 	<footer>

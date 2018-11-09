@@ -47,9 +47,13 @@ function init() {
 
 	let prevUnfoldedOracle = null;
 	oraclesContainer.addEventListener('click', e => {
-		if (e.target.nodeName !== 'A' || e.target.className !== 'oracle__show-more') return;
 		const oracle = e.target.getAttribute('data-oracle');
 		if (!oracle) return;
+		if (e.target.className === 'copy-icon') {
+			handleCopy(e.target, oracle);
+			return;
+		}
+		if (e.target.className !== 'fold-icon') return;
 		if (prevUnfoldedOracle) {
 			foldOracles(prevUnfoldedOracle, prevRenderedOracles);
 		}
@@ -60,6 +64,17 @@ function init() {
 			prevUnfoldedOracle = null;
 		}
 	});
+}
+
+function handleCopy(target, oracle) {
+	const text = target.appendChild(document.createElement('textarea'));
+	text.value = oracle;
+	text.focus();
+	text.select();
+	document.execCommand('copy');
+	target.removeChild(text);
+	target.classList.add('copied');
+	setTimeout(() => {target.classList.remove('copied')}, 500);
 }
 
 function renderNetworkOptionsSelect(select, networks, onChange) {
@@ -84,14 +99,12 @@ function renderNetworkOptionsSelect(select, networks, onChange) {
 
 function initFilter(renderedOracles, input) {
 	let timeout;
-	const showElement = el => { if (el.hasAttribute('hidden')) el.removeAttribute('hidden') };
-	const hideElement = el => { if (!el.hasAttribute('hidden')) el.setAttribute('hidden', true) }
 	input.addEventListener('input', () => {
 		if (timeout) clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			const search = input.value.toLowerCase();
 			if (input.value.length === 0) {
-				renderedOracles.forEach(({tr}) => showElement(tr));
+				renderedOracles.forEach(({tr}) => {tr.removeAttribute('hidden')});
 				initFoldingOracles(renderedOracles);
 				return;
 			}
@@ -102,9 +115,9 @@ function initFilter(renderedOracles, input) {
 					oracle.endpoint.toLowerCase().indexOf(search) !== -1 ||
 					oracle.title.toLowerCase().indexOf(search) !== -1
 				) {
-					showElement(tr);
+					tr.removeAttribute('hidden');
 				} else {
-					hideElement(tr);
+					tr.setAttribute('hidden', true);
 				}
 			});
 			initFoldingOracles(renderedOracles);
@@ -212,7 +225,7 @@ function render(registry, bondage, container) {
 
 function renderOracle(oracle, registry, bondage) {
 	const tr = document.createElement('tr');
-	tr.className = 'provider-listing ' + oracle.provider;
+	tr.className = 'provider-row ' + oracle.provider;
 	tr.id = '_' + oracle.provider + oracle.endpoint;
 	tr.appendChild(renderTitle(oracle, registry));
 	tr.appendChild(renderEndpoint(oracle, registry));
@@ -231,11 +244,16 @@ function renderOracle(oracle, registry, bondage) {
 
 function renderTitle(oracle, registry) {
 	const td = document.createElement('td');
+	const arrow = document.createElement('a');
+	arrow.className = 'fold-icon';
+	arrow.setAttribute('data-oracle', oracle.provider);
 	const a = document.createElement('a');
 	a.textContent = oracle.title;
 	getProviderInfoUrl(oracle.provider, registry).then(() => {
 		a.setAttribute('href', '#provider' + oracle.provider + oracle.endpoint);
 	});
+	a.appendChild(document.createElement('span'));
+	td.appendChild(arrow);
 	td.appendChild(a);
 	return td;
 }
@@ -290,19 +308,20 @@ function renderCurve(oracle, registry, td, dotsPromise) {
 
 function renderAddress(oracle) {
 	const td = document.createElement('td');
-	td.textContent = oracle.provider;
-	const showMore = document.createElement('a');
-	showMore.className = 'oracle__show-more';
-	showMore.setAttribute('data-oracle', oracle.provider)
-	td.appendChild(showMore);
+	const icon = document.createElement('a');
+	icon.title = oracle.provider;
+	icon.className = 'copy-icon';
+	icon.setAttribute('data-oracle', oracle.provider);
+	td.appendChild(icon);
 	return td;
 }
 
 function initFoldingOracles(renderedOracles) {
-	renderedOracles.forEach(({tr}) => {
-		tr.classList.remove('first-endpoint', 'folded-endpoint', 'visible', 'active');
+	renderedOracles.forEach(({tr, oracle}) => {
+		tr.className = 'provider-row ' + oracle.provider;
 	});
-	const visibleOracles = renderedOracles.filter(({tr}) => !tr.hasAttribute('hidden'))
+	const visibleOracles = renderedOracles.filter(({tr}) => !tr.hasAttribute('hidden'));
+	let firstIndex = 0;
 	for (let i = 0, len = visibleOracles.length; i < len; i++) {
 		const {tr, oracle} = visibleOracles[i];
 		const nextRow = visibleOracles[i + 1];
@@ -311,7 +330,15 @@ function initFoldingOracles(renderedOracles) {
 			(nextRow && nextRow.oracle.provider === oracle.provider) &&
 			(!prevRow || prevRow.oracle.provider !== oracle.provider)
 		) {
-			tr.classList.add('first-endpoint');
+			firstIndex = i;
+			tr.classList.add('first');
+		}
+		if (
+			(!nextRow || nextRow.oracle.provider !== oracle.provider) &&
+			(prevRow && prevRow.oracle.provider === oracle.provider)
+		) {
+			tr.classList.add('last');
+			visibleOracles[firstIndex].tr.firstChild.lastChild.lastChild.textContent = ' (' + (i - firstIndex + 1) + ')';
 		}
 		if (prevRow && prevRow.oracle.provider === oracle.provider) {
 			tr.classList.add('folded-endpoint');
@@ -321,7 +348,7 @@ function initFoldingOracles(renderedOracles) {
 
 function foldOracles(provider, renderedOracles) {
 	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
-	oracles[0].tr.classList.remove('active');
+	oracles[0].tr.classList.remove('visible');
 	for (let i = 1, len = oracles.length; i < len; i++) {
 		oracles[i].tr.classList.remove('visible');
 	}
@@ -329,7 +356,7 @@ function foldOracles(provider, renderedOracles) {
 
 function unfoldOracles(provider, renderedOracles) {
 	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
-	oracles[0].tr.classList.add('active');
+	oracles[0].tr.classList.add('visible');
 	for (let i = 1, len = oracles.length; i < len; i++) {
 		oracles[i].tr.classList.add('visible');
 	}
@@ -356,4 +383,15 @@ function curveToString(curve){
 	return str;
 }
 
+function loadCSS(href) {
+	const css = document.createElement('link');
+	css.rel = 'stylesheet';
+	css.href = href;
+	document.getElementsByTagName('head')[0].appendChild(css);
+}
+
 init();
+loadCSS('https://cdnjs.cloudflare.com/ajax/libs/dialog-polyfill/0.4.10/dialog-polyfill.min.css');
+loadCSS('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+loadCSS('https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.10.0/github-markdown.min.css');
+loadCSS('https://fonts.googleapis.com/css?family=Open+Sans:400,600,800');
