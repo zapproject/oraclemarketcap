@@ -182,12 +182,15 @@ function handleLocationChange(registry, dialog, oldURL, renderedOracles) {
 }
 
 function getAllProvidersWithEndpointsAndTitles(registry) {
+	console.info('Endpoints are filtered by default. To change default filter, set sessionStorage `default-endpoint-filter-text` item. Use empty string to show all endpoints');
+	let filterText = sessionStorage.getItem('default-endpoint-filter-text');
+	if (filterText === null) filterText = 'zap';
 	return registry.getAllProviders().then(providers => Promise.all([
 		Promise.all(providers.map(provider => registry.getProviderTitle(provider))),
 		Promise.all(providers.map(provider => registry.getProviderEndpoints(provider).then(endpoints => ({provider, endpoints})))),
 	])).then(([providerTitles, endpointsByProvider]) =>
 		endpointsByProvider.reduce((allEndpoints, {provider, endpoints}, providerIndex) =>
-			allEndpoints.concat(endpoints.map(endpoint => ({
+			allEndpoints.concat(endpoints.filter(endpoint => !filterText || endpoint.indexOf(filterText) !== -1).map(endpoint => ({
 				endpoint: endpoint,
 				provider: provider,
 				title: providerTitles[providerIndex],
