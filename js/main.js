@@ -25,7 +25,7 @@ function init() {
 	const handleNetworkChange = (network) => {
 		registry = new zapjs.ZapRegistry(network);
 		bondage = new zapjs.ZapBondage(network);
-		prevRenderedOracles.forEach(({tr}) => { oraclesContainer.removeChild(tr); }); // clear old oracles when network is changed
+		prevRenderedOracles.forEach(row => { oraclesContainer.removeChild(row.tr); }); // clear old oracles when network is changed
 		render(registry, bondage, oraclesContainer).then(renderedOracles => {
 			prevRenderedOracles = renderedOracles;
 			initFoldingOracles(prevRenderedOracles);
@@ -109,7 +109,9 @@ function initFilter(renderedOracles, input) {
 				return;
 			}
 			if (input.value.length < 3) return;
-			renderedOracles.forEach(({oracle, tr}) => {
+			renderedOracles.forEach(row => {
+				const oracle = row.oracle;
+				const tr = row.tr;
 				if (
 					oracle.provider.toLowerCase().indexOf(search) !== -1 ||
 					oracle.endpoint.toLowerCase().indexOf(search) !== -1 ||
@@ -145,11 +147,11 @@ function handleLocationChange(registry, dialog, oldURL, renderedOracles) {
 	let infoRequst;
 	switch(target) {
 		case 'endpoint':
-			infoRequst = getEndpointInfoUrl(provider, endpoint, registry);
+			infoRequst = getLinkFromProviderParam(provider, endpoint + '.md', registry);
 			container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}<br>Endpoint: ${endpoint}</p>`;
 			break;
 		case 'provider':
-			infoRequst = getProviderInfoUrl(provider, registry);
+			infoRequst = getLinkFromProviderParam(provider, 'profile.md', registry);
 			container.innerHTML = `<p>Loading info ...<br>Provider: ${provider}</p>`;
 			break;
 		default:
@@ -157,8 +159,8 @@ function handleLocationChange(registry, dialog, oldURL, renderedOracles) {
 	}
 	dialog.showModal();
 	infoRequst
-		.then(address => Promise.race([
-			fetch('https://cloudflare-ipfs.com/ipfs/' + address),
+		.then(url => Promise.race([
+			fetch(url),
 			new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout.')); }, 2000); }),
 		]))
 		.then(response => response.text())
@@ -193,26 +195,28 @@ function getAllProvidersWithEndpointsAndTitles(registry) {
 	).catch(console.error);
 }
 
-function getEndpointInfoUrl(address, endpoint, registry) {
-	return registry.contract.methods.getEndPointParams(address, registry.provider.utils.utf8ToHex(endpoint)).call().then(params => {
-		if (!params.length) throw new Error('No endpoint IPFS url param ');
-		const address = ipfsUtils.hexToAddress(params[0].replace('0x', ''));
-		if (!ipfsUtils.isIpfsAddress(address)) throw new Error('Endpoint first param is not a valid IPFS hash.');
-		return address;
-	});
+function paramToUrl(hexToUtf8, hex) {
+	if (!hex) throw new Error('Provider parameter is not set.');
+	let url;
+	try {
+		url = hexToUtf8(hex);
+	} catch (e) {
+		url = ipfsUtils.hexToAddress(hex);
+	}
+	if (ipfsUtils.isIpfsAddress(url)) return 'https://cloudflare-ipfs.com/ipfs/' + url;
+	if (/^https?:\/\//gmi.test(url)) return url;
+	throw new Error('Provider parameter is not a valid url.');
 }
 
-function getProviderInfoUrl(address, registry) {
-	const request = registry.contract.methods.getProviderParameter(address, registry.provider.utils.utf8ToHex('profile')).call();
+function getLinkFromProviderParam(address, param, registry) {
 	return new Promise((resolve, reject) => {
-		request.then(parameter => {
-			if (!parameter) reject(new Error('No provider IPFS url parameter.'));
-			const address = ipfsUtils.hexToAddress(parameter.replace('0x', ''));
-			if (!ipfsUtils.isIpfsAddress(address)) reject(new Error('Provider `profile` parameter is not a valid IPFS hash.'));
-			resolve(address);
-		}).catch(() => {
-			reject(new Error('Error occured. Perhaps provider parameter `profile` is not set.'));
-		});
+		registry.contract.methods.getProviderParameter(address, registry.provider.utils.utf8ToHex(param)).call()
+			.then(parameter => {
+				resolve(paramToUrl(registry.provider.utils.hexToUtf8, parameter));
+			})
+			.catch(() => {
+				// reject(new Error('param does not exist'));
+			});
 	});
 }
 
@@ -249,7 +253,7 @@ function renderTitle(oracle, registry) {
 	arrow.setAttribute('data-oracle', oracle.provider);
 	const a = document.createElement('a');
 	a.textContent = oracle.title;
-	getProviderInfoUrl(oracle.provider, registry).then(() => {
+	getLinkFromProviderParam(oracle.provider, 'profile.md', registry).then(() => {
 		a.setAttribute('href', '#provider' + oracle.provider + oracle.endpoint);
 	});
 	a.appendChild(document.createElement('span'));
@@ -262,7 +266,7 @@ function renderEndpoint(oracle, registry) {
 	const td = document.createElement('td');
 	const a = document.createElement('a');
 	a.textContent = oracle.endpoint;
-	getEndpointInfoUrl(oracle.provider, oracle.endpoint, registry).then(() => {
+	getLinkFromProviderParam(oracle.provider, oracle.endpoint + '.md', registry).then(() => {
 		a.setAttribute('href', '#endpoint' + oracle.provider + oracle.endpoint);
 	});
 	td.appendChild(a);
@@ -317,10 +321,10 @@ function renderAddress(oracle) {
 }
 
 function initFoldingOracles(renderedOracles) {
-	renderedOracles.forEach(({tr, oracle}) => {
-		tr.className = 'provider-row ' + oracle.provider;
+	renderedOracles.forEach(row => {
+		row.tr.className = 'provider-row ' + row.oracle.provider;
 	});
-	const visibleOracles = renderedOracles.filter(({tr}) => !tr.hasAttribute('hidden'));
+	const visibleOracles = renderedOracles.filter(row => !row.tr.hasAttribute('hidden'));
 	let firstIndex = 0;
 	for (let i = 0, len = visibleOracles.length; i < len; i++) {
 		const {tr, oracle} = visibleOracles[i];
@@ -347,7 +351,7 @@ function initFoldingOracles(renderedOracles) {
 }
 
 function foldOracles(provider, renderedOracles) {
-	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
+	const oracles = renderedOracles.filter(row => !row.tr.hasAttribute('hidden') && row.oracle.provider === provider);
 	oracles[0].tr.classList.remove('visible');
 	for (let i = 1, len = oracles.length; i < len; i++) {
 		oracles[i].tr.classList.remove('visible');
@@ -355,7 +359,7 @@ function foldOracles(provider, renderedOracles) {
 }
 
 function unfoldOracles(provider, renderedOracles) {
-	const oracles = renderedOracles.filter(({tr, oracle}) => !tr.hasAttribute('hidden') && oracle.provider === provider);
+	const oracles = renderedOracles.filter(row => !row.tr.hasAttribute('hidden') && row.oracle.provider === provider);
 	oracles[0].tr.classList.add('visible');
 	for (let i = 1, len = oracles.length; i < len; i++) {
 		oracles[i].tr.classList.add('visible');

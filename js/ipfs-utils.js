@@ -24,7 +24,7 @@ window.ipfsUtils = (function(){
     return from_b58(S, A).slice(2);
   }
   ipfsUtils.hexToAddress = function(H) {
-    return ipfsUtils.bytesToAddress(hexToBytes(H));
+    return ipfsUtils.bytesToAddress(hexToBytes(H.replace('0x', '')));
   };
   ipfsUtils.addressToHex = function(S) {
     return bytesToHex(ipfsUtils.addressToBytes(S));

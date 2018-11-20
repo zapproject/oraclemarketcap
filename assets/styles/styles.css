@@ -275,9 +275,12 @@ footer {
 
 /* Unfolded inner borders */
 
-.provider-row.visible.first > td::before {
+.provider-row.visible.first {
 	background-color: #f7f7f7;
 }
+/* .provider-row.visible.first > td::before {
+	background-color: #f7f7f7;
+} */
 .provider-row.visible.first > td:first-child {
 	border-top-left-radius: 4px;
 }
