@@ -299,8 +299,12 @@ function renderCurve(oracle, registry, td, dotsPromise) {
 	td.className = 'curve-chart';
 	return Promise.all([dotsPromise, registry.getProviderCurve(oracle.provider, oracle.endpoint)])
 		.then(([dots, curve]) => {
-			const lineChart = new ZapCurve.CurveLineChart(td, {width: 180, height: 60});
-			lineChart.draw(curve.values, Math.min(dots + 1, curve.max));
+			try {
+				const lineChart = new ZapCurveChart.CurveLineChart(td, {width: 180, height: 60, maxDots: 150});
+				lineChart.draw(curve.values, Math.min(dots + 1, curve.max));
+			} catch (e) {
+				console.log(e, oracle, curve, dots);
+			}
 			const div = document.createElement('div');
 			const div1 = document.createElement('div');
 			const div2 = document.createElement('div');
