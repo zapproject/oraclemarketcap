@@ -225,7 +225,7 @@ function renderCurve(oracle, endpoint, td, dotsPromise) {
 function renderAddress(oracle) {
 	const td = document.createElement('td');
 	const icon = document.createElement('a');
-	icon.title = oracle.provider;
+	icon.title = oracle.providerOwner;
 	icon.className = 'copy-icon';
 	icon.setAttribute('data-oracle', oracle.providerOwner);
 	td.appendChild(icon);
@@ -329,7 +329,6 @@ function parseHash() {
 
 function navigate(params) {
 	const url = '#' + makeHash({...parseHash(), ...params});
-	console.log('url', url);
 	window.location.href = url;
 }
 

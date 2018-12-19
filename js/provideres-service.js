@@ -59,7 +59,6 @@ class ProvidersService {
       this.providersWithTitles(pageProviders),
       this.providersWithEndpoints(pageProviders),
     ]);
-    console.log('pageProviders', pageProviders);
     return {
       items: pageProviders.map(provider => ({provider, endpoints: provider.endpoints})),
       total: providers.length,

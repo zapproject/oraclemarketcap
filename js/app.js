@@ -43,7 +43,7 @@ class OracleMarketCap {
 
 
 		initSelect(this.selectRef, this.networks, this.handleNetworkChange);
-		initFilter(this.searchRef, search => navigate({search}), parseHash().search);
+		initFilter(this.searchRef, search => navigate({search, page: 1}), parseHash().search);
 		window.addEventListener('hashchange', this.locationChanged);
 		this.oraclesContainerRef.addEventListener('click', this.handleClick);
 
