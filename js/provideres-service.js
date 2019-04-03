@@ -1,13 +1,22 @@
+const restrictedAddresses = [
+  '0xaD0Adf0C81E9c18D5DE0D6D5555A909c6435062D',
+  '0x2416002D127175BC2d627FAefdaA4186c7c49833',
+  '0x47834a7533Eb6CB6F8ca1677405423e476cE3f31',
+  '0x6Be845635029C8C8F44bc8d729624d0c41adCcDE'
+];
+
 class ProvidersService {
 
   constructor(networkId, networkProvider) {
     this.networkId = networkId;
     this.networkProvider = networkProvider;
     this.registry = new zapjs.ZapRegistry(this.networkOptions);
+    this.bondage = new zapjs.ZapBondage(this.networkOptions);
     this.networkProvider = this.registry.provider.currentProvider;
     this.updateProvidersData();
     this.registry.listenNewProvider({}, () => { this.updateProvidersData(); });
     this.registry.listenNewCurve({}, () => { this.updateProvidersData(); });
+    this.formatBondEvent = this.formatBondEvent.bind(this);
   }
 
   get allProviders() {
@@ -30,6 +39,14 @@ class ProvidersService {
     return this.registry.getAllProviders();
   }
 
+  async getProvidersByBoundDots() {
+    const endpointsWithDots = await this.bondage.contract.getPastEvents('Bound', {
+      fromBlock: 0,
+      toBlock: 'latest',
+    }).then(events => ProvidersService.groupEndpointsByProvider(ProvidersService.combineBondEvents(events.map(this.formatBondEvent)).sort(ProvidersService.sortByNumDots)));
+    return endpointsWithDots;
+  }
+
   async providersWithTitles(providers) {
     await Promise.all(providers.filter(provider => !provider.title).map((provider) => provider.getTitle()));
     return providers;
@@ -41,9 +58,17 @@ class ProvidersService {
   }
 
   updateProvidersData() {
-    this.allProviderAddressesPromise = this.registry.getAllProviders();
+    const sortedProvidersPromise = this.getProvidersByBoundDots();
+    this.allProviderAddressesPromise = Promise.all([
+      (this.registry.getAllProviders()) .then(addresses => addresses.filter(address => restrictedAddresses.indexOf(address) === -1)),
+      sortedProvidersPromise,
+    ]).then(([allProviders, providersSortedByDots]) => {
+      // get some providers with known numDots and sort them
+      return ProvidersService.sortItemsByNumDots(allProviders, providersSortedByDots, 'address');
+    });
     // do not load titles for providers on the first run, only when requested
     this.allOraclesPromise = this.allProviderAddresses.then(providerAddresses => Promise.all(providerAddresses.map(address => this.loadProvider(address))));
+    // this.endpointsPromise = Promise.all([this.allProviders, sortedProvidersPromise]).then(([providers, sortedProviders]) => this.updateEndpoints(providers, sortedProviders));
   }
 
   loadProvider(owner) {
@@ -91,6 +116,94 @@ class ProvidersService {
     };
   }
 
+  static sortItemsByNumDots(allItems, itemsWithDots, returnField) {
+    const items = [];
+    for (let i = 0, len = itemsWithDots.length; i < len; i++) {
+      const provider = itemsWithDots[i];
+      if (allItems.indexOf(provider[returnField]) === -1) continue;
+      items.push(provider[returnField]);
+    }
+    for (let i = 0, len = allItems.length; i < len; i++) {
+      const provider = allItems[i];
+      if (items.indexOf(provider) !== -1) continue;
+      items.push(provider);
+    }
+    return items;
+  }
+
+
+  formatBondEvent(event) {
+    const hexToUtf8 = this.bondage.provider.utils.hexToUtf8;
+    return {
+      endpoint: hexToUtf8(event.returnValues.endpoint),
+      provider: event.returnValues.oracle,
+      numDots: Number(event.returnValues.numDots),
+    };
+  }
+
+  static groupEndpointsByProvider(endpoints) {
+    const providers = [];
+    const len = endpoints.length;
+    for (let i = 0; i < len; i++) {
+      const endpoint = endpoints[i];
+      const index = ProvidersService.getIndexByAddress(providers, endpoint.provider);
+      if (index !== -1) {
+        providers[index].endpoints.push(endpoint);
+        providers[index].numDots += endpoint.numDots;
+        continue;
+      }
+      providers.push({
+        address: endpoint.provider,
+        endpoints: [endpoint],
+        numDots: endpoint.numDots,
+      });
+    }
+    return providers.sort(ProvidersService.sortByNumDots);
+  }
+
+  static getIndexByAddress(providers, address) {
+    return ProvidersService.getIndexBy(providers, address, 'address');
+  }
+
+  static getIndexBy(items, value, field) {
+    let i = items.length;
+    while (i--) {
+      if (items[i][field] === value) return i;
+    }
+    return -1;
+  }
+
+  static getEndpointByProviderAndEndpoint(endpoints, endpoint, provider) {
+    let i = endpoints.length;
+    while (i--) {
+      if (endpoints[i].endpoint === endpoint && endpoints[i].provider === provider) return endpoints[i];
+    }
+    return null;
+  }
+
+  static combineBondEvents(events) {
+    const endpoints = [];
+    let i = events.length;
+    while (i--) {
+      const endpoint = ProvidersService.getEndpointByProviderAndEndpoint(endpoints, events[i].endpoint, events[i].provider);
+      if (endpoint) {
+        endpoint.numDots += events[i].numDots;
+      } else {
+        endpoints.push({
+          endpoint: events[i].endpoint,
+          provider: events[i].provider,
+          curve: events[i].curve,
+          numDots: events[i].numDots,
+        });
+      }
+    }
+    return endpoints;
+  }
+
+  static sortByNumDots(a, b) {
+    return b.numDots - a.numDots;
+  }
+
   get networkOptions() {
     const handler = {
       handleIncoming: (data) => {
@@ -108,14 +221,14 @@ class ProvidersService {
 }
 
 class Provider extends zapjs.ZapProvider {
-	constructor(owner, options) {
-		super(owner, options);
-		this.endpoints = null;
-	}
-	async getEndpoints() {
-		if (this.endpoints) return this.endpoints;
+  constructor(owner, options) {
+    super(owner, options);
+    this.endpoints = null;
+  }
+  async getEndpoints() {
+    if (this.endpoints) return this.endpoints;
     const endpoints = await this.zapRegistry.getProviderEndpoints(this.providerOwner);
     this.endpoints = endpoints;
     return this.endpoints;
-	}
+  }
 }

@@ -197,6 +197,7 @@ function renderDots(oracle, endpoint, td) {
 
 function renderPrice(td, dotsPromise, curvePromise) {
 	return Promise.all([dotsPromise, curvePromise]).then(([dots, curve]) => {
+		if (!curve) return;
 		td.textContent = curve.getPrice(Math.min(dots + 1, curve.max));
 	}).catch(console.error);
 }
@@ -355,7 +356,14 @@ function renderPagination(container, pages, hash) {
 }
 
 function clearOraclesRows(oraclesContainer, rows) {
-	rows.forEach(row => { oraclesContainer.removeChild(row.tr); });
+	rows.forEach(row => {
+		if (!row.tr) return;
+		try {
+			oraclesContainer.removeChild(row.tr);
+		} catch (e) {
+			console.warn(e);
+		}
+	});
 }
 
 function loadCSS(href) {

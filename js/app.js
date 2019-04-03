@@ -16,13 +16,13 @@ class OracleMarketCap {
 				name: 'Mainnet',
 				networkProvider: 'wss://mainnet.infura.io/ws',
 				networkId: 1,
-				disabled: true
+				// disabled: true
 			},
 			{
 				name: 'Localhost 8546',
 				networkProvider: 'ws://localhost:8546',
 				networkId: 1337,
-				disabled: true
+				// disabled: true
 			}
 		];
 		this.providersService = null;
@@ -158,6 +158,7 @@ class OracleMarketCap {
 	}
 
 	async handleNetworkChange(network) {
+		this.firstExpand = true;
 		clearOraclesRows(this.oraclesContainerRef, this.prevRenderedOracles);
 		this.providersService = new ProvidersService(network.networkId, network.networkProvider);
 		this.allProviderAddresses = await this.providersService.allProviderAddresses;
