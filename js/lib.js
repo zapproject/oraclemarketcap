@@ -89,7 +89,7 @@ function getUrlText(url) {
 	return Promise.race([
 		fetch(ipfsUtils.isIpfsAddress(url) ? 'https://cloudflare-ipfs.com/ipfs/' + url : url),
 		new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout.')); }, 2000); }),
-	]).then((response) => response.text());
+	]).then((response) => response.text()).catch(() => '');
 }
 
 function render(container, providersWithEndpoints) {
@@ -157,7 +157,7 @@ function renderTitle(oracle, endpointsCount) {
 	getProviderParam(oracle, 'profile.md').then(url => {
 		if (!url) return;
 		a.href = url;
-	});
+	}).catch(console.info);
 	if (endpointsCount > 1) {
 		const arrow = document.createElement('a');
 		arrow.className = 'fold-icon';
@@ -178,20 +178,20 @@ function renderEndpoint(oracle, endpoint) {
 	getProviderParam(oracle, endpoint + '.md').then(url => {
 		if (!url) return;
 		a.href = '#' + makeHash({...parseHash(), expandedAddress: oracle.providerOwner + endpoint});
-	});
+	}).catch(console.info);
 	td.appendChild(a);
 	return td;
 }
 
 function renderZap(oracle, endpoint) {
 	const td = document.createElement('td');
-	oracle.getZapBound(endpoint).then(zap => { td.textContent = zap; });
+	oracle.getZapBound(endpoint).then(zap => { td.textContent = zap; }).catch(console.info);
 	return td;
 }
 
 function renderDots(oracle, endpoint, td) {
-	const promise = oracle.getDotsIssued(endpoint).then(Number);
-	promise.then(dots => { td.textContent = dots; });
+	const promise = oracle.getDotsIssued(endpoint).then(Number).catch(console.info);
+	promise.then(dots => { td.textContent = dots; }).catch(console.info);
 	return promise;
 }
 

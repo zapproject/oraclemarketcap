@@ -140,11 +140,11 @@ class OracleMarketCap {
 		this.closeDialog();
 		const hash = parseHash();
 		const { page, expandedAddress, search } = this.prevHash;
-		const oracleAddress = hash.expandedAddress.slice(0, 42);
+		/* const oracleAddress = hash.expandedAddress.slice(0, 42);
 		if (hash.expandedAddress && expandedAddress !== hash.expandedAddress) {
 			const expandedAddressPage = getPageForItem(oracleAddress, this.allProviderAddresses, this.pageSize);
 			if (expandedAddressPage > 0) hash.page = expandedAddressPage;
-		}
+		} */
 		this.prevHash = hash;
 		if (this.firstExpand || hash.page !== page || hash.search !== search) {
 			this.firstExpand = false;
