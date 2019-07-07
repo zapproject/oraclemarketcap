@@ -1,0 +1,48 @@
+{
+  "name": "oraclemarketcap",
+  "version": "1.0.0",
+  "description": "`CREATE DATABASE oraclemarketcap` `USE oraclemarketcap`",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack-dev-server --config webpack.dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-smartum:zapproject/oraclemarketcap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@zapjs/artifacts": "^2.2.3",
+    "@zapjs/dispatch": "^2.2.2",
+    "@zapjs/provider": "^2.2.3",
+    "@zapjs/registry": "^2.2.3",
+    "@zapjs/subscriber": "^2.2.3",
+    "@zapjs/tokendot": "^2.2.1",
+    "@zapjs/types": "^2.2.4",
+    "@zapjs/zaptoken": "^2.2.2",
+    "bignumber.js": "^9.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.4",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^5.0.3",
+    "css-loader": "^3.0.0",
+    "file-loader": "^4.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "raw-loader": "^3.0.0",
+    "style-loader": "^0.23.1",
+    "ts-loader": "^6.0.4",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.2",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^3.7.2",
+    "webpack-merge": "^4.2.1"
+  }
+}

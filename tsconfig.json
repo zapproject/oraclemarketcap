@@ -1,0 +1,29 @@
+{
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": false,
+    "jsx": "react",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es6",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": [
+      "es2015",
+      "es2017",
+      "dom"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
