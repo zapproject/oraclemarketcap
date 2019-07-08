@@ -15,7 +15,7 @@ interface Props {
 
 export const TableRow = React.memo(({oracle, endpoint, endpointsCount, isFirst, isLast}: Props) => (
 	<tr>
-		<ProviderTitle></ProviderTitle>
+		(isFirst ? <ProviderTitle oracle={oracle} endpointsCount={endpointsCount}></ProviderTitle> : <td>&nbsp;</td>)
 		<ProviderEndpoint></ProviderEndpoint>
 		<ProviderDots></ProviderDots>
 		<ProviderPrice></ProviderPrice>
