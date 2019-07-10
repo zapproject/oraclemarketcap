@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export const ProviderDots = React.memo(() => (
+export const ProviderAddress = React.memo(() => (
 	<td>
 		&nbsp;
 	</td>

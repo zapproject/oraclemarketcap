@@ -4,6 +4,8 @@ import { ProvidersService } from './ProviderService';
 import { networks } from './netowrks';
 import { getPageStart } from './utils';
 import { ZapProvider } from '@zapjs/provider';
+import { TableContainer } from './components/main/TableContainer';
+import Web3 from 'web3';
 
 interface State {
 	loading: string;
@@ -49,26 +51,29 @@ export class App extends React.PureComponent<any, State> {
 		const { page, search } = this.state;
 		const start = getPageStart(page, pageSize);
 		const {items, total} = await (search
-			? this.providersService.search(search, start, pageSize)
-			: this.providersService.getProviders(start, pageSize));
+			? this.providersService.search(search, start, false, pageSize)
+			: this.providersService.getProviders(start, false, pageSize));
 		this.setState({items, total});
 	}
 
-	handleNetworkChange(netId) {
+	async handleNetworkChange(netId) {
 		const network = networks.find(e => e.networkId === netId);
 		if (!network) return;
 		this.setState({netId})
-		this.providersService = new ProvidersService(netId, network.networkProvider);
+		const web3 = new Web3(network.networkProvider);
+		await web3.eth.net.getId();
+		this.providersService = new ProvidersService(netId, web3.eth.currentProvider, web3);
 		this.setState({page: 1, search: ''}, () => {
 			this.getOracles();
 		});
 	}
 
 	render() {
-		const { search, netId } = this.state;
+		const { search, netId, items } = this.state;
 		return (
 			<React.Fragment>
 				<Header search={search} netId={netId} onNetworkChange={this.handleNetworkChange} />
+				<TableContainer items={items} />
 			</React.Fragment>
 		)
 	}

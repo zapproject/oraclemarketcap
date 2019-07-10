@@ -153,12 +153,12 @@ function renderTitle(oracle, endpointsCount) {
 	const td = document.createElement('td');
 	const a = document.createElement('a');
 	a.textContent = oracle.title;
-	const url = '#' + makeHash({...parseHash(), expandedAddress: oracle.providerOwner});
 	getProviderParam(oracle, 'profile.md').then(url => {
 		if (!url) return;
 		a.href = url;
 	}).catch(console.info);
 	if (endpointsCount > 1) {
+		const url = '#' + makeHash({...parseHash(), expandedAddress: oracle.providerOwner});
 		const arrow = document.createElement('a');
 		arrow.className = 'fold-icon';
 		arrow.setAttribute('data-oracle', oracle.providerOwner);

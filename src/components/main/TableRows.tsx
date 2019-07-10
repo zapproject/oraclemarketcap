@@ -21,6 +21,6 @@ export const TableRows = React.memo(({items}: Props) => {
 		})
 	})
 	return <React.Fragment>
-		{oraclesWithEndpoints.map(params => <TableRow {...params} />)}
+		{oraclesWithEndpoints.map(params => <TableRow key={params.endpoint + params.oracle.providerOwner} {...params} />)}
 	</React.Fragment>
 });

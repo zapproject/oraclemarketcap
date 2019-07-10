@@ -1,3 +1,6 @@
+import { hexToAddress, isIpfsAddress } from "./ipfs-utils";
+import { utf8ToHex, hexToUtf8 } from 'web3-utils';
+
 export function handleCopy(e) {
 	const target = e.target;
 	const oracle = target.getAttribute('data-oracle');
@@ -65,7 +68,23 @@ export function getAllProvidersWithEndpointsAndTitles(registry) {
 	).catch(console.error);
 }
 
-/* export function getProviderParam(provider, key) {
+/* export function decodeParam(hex: string): string {
+	if (hex.indexOf('0x') !== 0) return hex;
+	try {
+		return hexToUtf8(hex);
+	} catch (e) {
+		console.log(e);
+	}
+	try {
+		const address = hexToAddress(hex.replace('0x', ''));
+		if (isIpfsAddress(address)) return address;
+	} catch (e) {
+		console.log(e);
+	}
+	return hex;
+} */
+
+export function getProviderParam(provider, key) {
 	return provider.zapRegistry.contract.methods.getProviderParameter(provider.providerOwner, provider.zapRegistry.provider.utils.utf8ToHex(key)).call().then(hex => {
 		if (hex.indexOf('0x') !== 0) return hex;
 		try {
@@ -75,7 +94,7 @@ export function getAllProvidersWithEndpointsAndTitles(registry) {
 		}
 		try {
 			const address = hexToAddress(hex.replace('0x', ''));
-			if (ipfsUtils.isIpfsAddress(address)) return address;
+			if (isIpfsAddress(address)) return address;
 		} catch (e) {
 			console.log(e);
 		}
@@ -83,7 +102,7 @@ export function getAllProvidersWithEndpointsAndTitles(registry) {
 	}).catch(e => {
 		return '';
 	});
-} */
+}
 
 /* export function getUrlText(url) {
 	return Promise.race([
