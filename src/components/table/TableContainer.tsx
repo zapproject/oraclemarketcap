@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TableRows } from './TableRows';
 
-export const TableContainer = React.memo(({items}: any) => (
+export const TableContainer = React.memo(({items, expanded}: any) => (
 	<div className="table-container">
 		<div className="table-header-background"></div>
 		<table className="provider-table">
@@ -15,7 +15,7 @@ export const TableContainer = React.memo(({items}: any) => (
 					<th className="table-title">Bonding Curve</th>
 					<th className="table-title">Oracle Address</th>
 				</tr>
-				<TableRows items={items} />
+				<TableRows items={items} expanded={expanded} />
 			</tbody>
 		</table>
 	</div>

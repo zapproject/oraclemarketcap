@@ -24,8 +24,10 @@
     "@zapjs/types": "^2.2.4",
     "@zapjs/zaptoken": "^2.2.2",
     "bignumber.js": "^9.0.0",
+    "marked": "^0.7.0",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "zap-curve-chart": "git+https://github.com/zapproject/zap-curve-chart.git"
   },
   "devDependencies": {
     "@types/react": "^16.8.23",
