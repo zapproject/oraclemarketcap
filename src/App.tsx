@@ -113,8 +113,8 @@ export class App extends React.PureComponent<any, State> {
 		const { page, search } = this.state;
 		const start = getPageStart(page, pageSize);
 		const {items, total} = await (search
-			? this.providersService.search(search, start, false, pageSize)
-			: this.providersService.getProviders(start, false, pageSize));
+			? this.providersService.search(search, start, false, pageSize, true)
+			: this.providersService.getProviders(start, false, pageSize, true));
 		this.setState({items, total});
 	}
 
