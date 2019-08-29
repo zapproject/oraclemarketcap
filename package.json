@@ -25,26 +25,27 @@
     "@zapjs/zaptoken": "^2.2.2",
     "bignumber.js": "^9.0.0",
     "marked": "^0.7.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "zap-curve-chart": "git+https://github.com/zapproject/zap-curve-chart.git"
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "zap-curve-chart": "git+https://github.com/zapproject/zap-curve-chart.git",
+    "zap-extras": "git+file:///opt/projects/zap-extras"
   },
   "devDependencies": {
-    "@types/react": "^16.8.23",
-    "@types/react-dom": "^16.8.4",
+    "@types/react": "^16.9.2",
+    "@types/react-dom": "^16.9.0",
     "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^5.0.3",
-    "css-loader": "^3.0.0",
-    "file-loader": "^4.0.0",
+    "copy-webpack-plugin": "^5.0.4",
+    "css-loader": "^3.2.0",
+    "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
-    "raw-loader": "^3.0.0",
+    "raw-loader": "^3.1.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.4",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.2",
-    "webpack": "^4.35.2",
-    "webpack-cli": "^3.3.5",
-    "webpack-dev-server": "^3.7.2",
-    "webpack-merge": "^4.2.1"
+    "typescript": "^3.6.2",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0",
+    "webpack-merge": "^4.2.2"
   }
 }

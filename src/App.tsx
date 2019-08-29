@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Header } from './components/header/Header';
-import { ProvidersService } from './ProviderService';
 import { networks } from './netowrks';
-import { parseHash, getProviderParam, getUrlText } from './utils';
+import { parseHash } from './utils';
 import { ZapProvider } from '@zapjs/provider';
 import Web3 from 'web3';
 import { TableContainer } from './components/table/TableContainer';
@@ -10,6 +9,8 @@ import { ProvidersPagination } from './components/pagination/ProvidersPagination
 import { getPageStart, getTotalPages, getPages } from './components/pagination/pagination';
 import marked from 'marked';
 import { Dialog } from './components/dialog/Dialog';
+import { ProvidersService } from 'zap-extras/lib/ethereum/providers-service';
+import { getUrlText, getProviderParam } from 'zap-extras/lib/ethereum/params-utils';
 
 interface State {
 	loading: string;

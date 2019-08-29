@@ -1,4 +1,3 @@
-import { hexToAddress, isIpfsAddress } from "./ipfs-utils";
 // import { utf8ToHex, hexToUtf8 } from 'web3-utils';
 
 export function handleCopy(e) {
@@ -84,32 +83,6 @@ export function getAllProvidersWithEndpointsAndTitles(registry) {
 	return hex;
 } */
 
-export function getProviderParam(provider, key) {
-	return provider.zapRegistry.contract.methods.getProviderParameter(provider.providerOwner, provider.zapRegistry.provider.utils.utf8ToHex(key)).call().then(hex => {
-		if (hex.indexOf('0x') !== 0) return hex;
-		try {
-			return provider.zapRegistry.provider.utils.hexToUtf8(hex);
-		} catch (e) {
-			console.log(e);
-		}
-		try {
-			const address = hexToAddress(hex.replace('0x', ''));
-			if (isIpfsAddress(address)) return address;
-		} catch (e) {
-			console.log(e);
-		}
-		return hex;
-	}).catch(e => {
-		return '';
-	});
-}
-
-export function getUrlText(url) {
-	return Promise.race([
-		fetch(isIpfsAddress(url) ? 'https://cloudflare-ipfs.com/ipfs/' + url : url),
-		new Promise((_, reject) => { setTimeout(() => { reject(new Error('Request timeout.')); }, 2000); }),
-	]).then((response) => (response as Response).text()).catch(() => '');
-}
 
 /* export function render(container, providersWithEndpoints) {
 	const rows = [];

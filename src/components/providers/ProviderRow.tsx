@@ -4,7 +4,7 @@ import { ProviderEndpoint } from './ProviderEndpoint';
 import { ProviderPrice } from './ProviderPrice';
 import { ProviderCurve } from './ProviderCurve';
 import { ProviderAddress } from './ProviderAddress';
-import { getProviderParam } from '../../utils';
+import { getProviderParam } from 'zap-extras/lib/ethereum/params-utils';
 
 interface Props {
 	oracle: any;
@@ -14,7 +14,6 @@ interface Props {
 	isFirst: boolean;
 	isLast: boolean;
 }
-
 
 export const ProviderRow = ({oracle, endpoint, expanded, endpointsCount, isFirst, isLast}: Props) => {
 	const [endpointData, setEndpointData] = React.useState({
