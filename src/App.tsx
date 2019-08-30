@@ -5,8 +5,9 @@ import { parseHash } from './utils';
 import { ZapProvider } from '@zapjs/provider';
 import Web3 from 'web3';
 import { TableContainer } from './components/table/TableContainer';
-import { ProvidersPagination } from './components/pagination/ProvidersPagination';
-import { getPageStart, getTotalPages, getPages } from './components/pagination/pagination';
+import { OraclesPagination } from 'zap-extras/lib/ui/shared/pagination/OraclesPagination';
+import 'zap-extras/lib/ui/shared/pagination/oracles-pagination.css';
+import { getPageStart, getTotalPages, getPages } from 'zap-extras/lib/ui/shared/pagination/utils';
 import marked from 'marked';
 import { Dialog } from './components/dialog/Dialog';
 import { ProvidersService } from 'zap-extras/lib/ethereum/providers-service';
@@ -151,7 +152,7 @@ export class App extends React.PureComponent<any, State> {
 			<React.Fragment>
 				<Header search={search} netId={netId} onNetworkChange={this.handleNetworkChange} />
 				<TableContainer items={items} expanded={expanded} />
-				<ProvidersPagination search={search} currentPage={page} pages={pages} />
+				<OraclesPagination baseUrl="#" search={search} currentPage={page} pages={pages} />
 				{!!dialogHTML && <Dialog onClose={() => {this.setState({dialogHTML: ''})}} html={dialogHTML} />}
 			</React.Fragment>
 		)
