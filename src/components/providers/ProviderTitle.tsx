@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { ZapProvider } from '@zapjs/provider';
 import { ProviderTitleExpandArrow } from './ProviderTitleExpandArrow';
-import { makeHash, parseHash } from '../../utils';
+import { makeHash } from '../../utils';
+import { parseHash } from 'zap-extras/lib/ui/shared/pagination/utils';
 
 interface Props {
 	endpointsCount: number;

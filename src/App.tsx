@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { Header } from './components/header/Header';
 import { networks } from './netowrks';
-import { parseHash } from './utils';
 import { ZapProvider } from '@zapjs/provider';
 import Web3 from 'web3';
 import { TableContainer } from './components/table/TableContainer';
 import { OraclesPagination } from 'zap-extras/lib/ui/shared/pagination/OraclesPagination';
 import 'zap-extras/lib/ui/shared/pagination/oracles-pagination.css';
-import { getPageStart, getTotalPages, getPages } from 'zap-extras/lib/ui/shared/pagination/utils';
+import { getPageStart, getTotalPages, getPages, parseHash } from 'zap-extras/lib/ui/shared/pagination/utils';
 import marked from 'marked';
 import { Dialog } from './components/dialog/Dialog';
 import { ProvidersService } from 'zap-extras/lib/ethereum/providers-service';
